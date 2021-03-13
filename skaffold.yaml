@@ -2,14 +2,14 @@ apiVersion: skaffold/v2alpha4
 kind: Config
 
 metadata:
-  name: popular-slides
+  name: vaccination-progress
 
 build:
   artifacts:
-    - image: farberg/popular-slides
+    - image: semba/vaccination-progress
       context: web-app
 
-    - image: farberg/popular-slides-spark
+    - image: semba/vaccination-progress-spark
       context: spark-app
 
 deploy:

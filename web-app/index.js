@@ -156,7 +156,7 @@ function sendResponse(res, html, cachedResult) {
 			</script>
 		</head>
 		<body>
-			<h1>Big Data Use Case Demo</h1>
+			<h1>World vaccination progress</h1>
 			<p>
 				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
 				<span id="out"></span>

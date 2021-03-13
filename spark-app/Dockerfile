@@ -1,5 +1,5 @@
 FROM bitnami/spark:3.0.0
-LABEL maintainer="Dennis Pfisterer, http://dennis-pfisterer.de"
+LABEL maintainer="Sebastian Mertins, https://sem-ba.de"
 WORKDIR /app
 
 #------------------------------------
