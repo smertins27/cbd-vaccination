@@ -1,11 +1,16 @@
-# Use Case: Popular NASA Shuttle Missions
+# Required software
+To develop and deploy the project in a local Kubernetes some software requirements needs to be installed.
+This case shows the commands for macOS
 
-```json
-{ 
-	mission: 'sts-10', 
-	timestamp: 1604325221 
-}
-```
+Minikube: `brew install minikube`
+
+Skaffold: `brew install skaffold`
+
+Helm: `brew install helm`
+
+Enable ingress `minikube addons enable ingress`
+
+# Use Case: World vaccination progress
 
 ## Prerequisites
 
