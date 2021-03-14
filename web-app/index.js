@@ -158,7 +158,7 @@ app.get('/', (req, res) => {
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: states.cached}
 		}
 		res.render(path.join(__dirname, 'public/overview/overview.html'), parameters);
-	}).catch(e => {
+	}).catch(e => {// Catch error to prevent server crash
 		console.error(e);
 	});
 })
@@ -175,7 +175,7 @@ app.get('/state/:iso', function(req, res){
 		console.log(state);
 		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
 
-	}).catch(e => {
+	}).catch(e => { // Catch error to prevent server crash
 		console.error(e);
 	});
 });
