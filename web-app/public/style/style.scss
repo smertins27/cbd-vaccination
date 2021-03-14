@@ -42,8 +42,11 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
   &.extend { max-width: 88rem;}
 }
 
-#page.index .content { display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
-  h1 { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
+#page .content {display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
+  h1 { grid-column-start: 1; grid-column-end: 3; grid-row-start: 1; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
+}
+
+#page.index .content {
   .form { grid-column-start: 2; grid-row-start: 2;
     form { width: 100%;
       .inputs {
@@ -66,4 +69,8 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
       &:hover { fill: #49A0E8;}
     }
   }
+}
+
+#page.state .content {
+  .map { background: { size: contain; repeat: no-repeat; position: center center;} width: 75%; height: 512px; margin: 0 auto; grid-column-start: 1; grid-row-start: 2;}
 }
