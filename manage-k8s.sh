@@ -18,6 +18,9 @@ function start(){
   helm install my-kafka-operator strimzi/strimzi-kafka-operator
   kubectl apply -f kafka-cluster.yaml
   helm install --namespace=default --set hdfs.dataNode.replicas=1 --set yarn.nodeManager.replicas=1 --set hdfs.webhdfs.enabled=true my-hadoop-cluster stable/hadoop
+
+  # Not used -> Caused errors on kafka cluster. Better run manual after everything is up and running
+  # skaffold dev
 }
 
 # Clear the whole minikube to get a clean base
