@@ -42,15 +42,17 @@ function validateForm(){
     const $form = $('#vaccinationForm');
     const $submitBtn = $('#vaccinationForm button[type="submit"]');
     const values = $form.serializeArray();
-    values.forEach(value => {
-        if (value.value !== ''){
-           $submitBtn.prop('disabled', false);
-           $submitBtn.removeClass('disabled');
-        }else{
-            $submitBtn.prop('disabled', true);
-            $submitBtn.addClass('disabled');
-        }
+    const invalid = values.some(value => {
+        return value.value === '';
     });
+
+    if(invalid){
+        $submitBtn.prop('disabled', true);
+        $submitBtn.addClass('disabled');
+    }else{
+        $submitBtn.prop('disabled', false);
+        $submitBtn.removeClass('disabled');
+    }
 }
 
 function clickOnState(iso){
