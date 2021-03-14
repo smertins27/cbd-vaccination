@@ -22,7 +22,9 @@ $disabled: #808080;
 * { @include font(); @include boxModel}
 body { margin: 0; padding: 0; background: $pageBg;}
 
-select, input { width: 100%; @include font(500); font: { size: 1.25rem;}; padding: 4px 8px; background: #808080; color: #f0f0f0; border-radius: 8px; border: 0;}
+select, input { width: 100%; @include font(500); font: { size: 1.25rem;}; padding: 4px 8px; background: #808080; color: #f0f0f0; border-radius: 8px; border: 0;
+  &::placeholder { color: $disabled;}
+}
 input[type="number"] { -moz-appearance:textfield;}
 select { -moz-appearance: none; -webkit-appearance: none; appearance: none; border: none; -moz-padding-start: calc(10px - 3px); padding-left: 10px; outline: none; cursor: pointer; }
 select::-ms-expand {display: none;}
@@ -41,8 +43,8 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
 }
 
 #page.index .content { display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
-  h1 { grid-column-start: 1; grid-column-end: 2; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
-  .form { grid-column-start: 1;
+  h1 { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
+  .form { grid-column-start: 2; grid-row-start: 2;
     form { width: 100%;
       .inputs {
         .inputField { width: 60%; float: left;
@@ -59,7 +61,7 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
       }
     }
   }
-  .map { width: 100%; grid-column-start: 2;
+  .map { width: 100%; grid-column-start: 1; grid-row-start: 2;
     svg path { cursor: pointer;
       &:hover { fill: #49A0E8;}
     }

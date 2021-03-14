@@ -22,6 +22,8 @@ select, input {
   color: #f0f0f0;
   border-radius: 8px;
   border: 0; }
+  select::placeholder, input::placeholder {
+    color: #808080; }
 
 input[type="number"] {
   -moz-appearance: textfield; }
@@ -82,12 +84,14 @@ footer {
   #page.index .content h1 {
     grid-column-start: 1;
     grid-column-end: 2;
+    grid-row-start: 1;
     font-weight: 700;
     font-size: 2rem;
     width: 100%;
     display: block; }
   #page.index .content .form {
-    grid-column-start: 1; }
+    grid-column-start: 2;
+    grid-row-start: 2; }
     #page.index .content .form form {
       width: 100%; }
       #page.index .content .form form .inputs .inputField {
@@ -126,7 +130,8 @@ footer {
           background: #808080; }
   #page.index .content .map {
     width: 100%;
-    grid-column-start: 2; }
+    grid-column-start: 1;
+    grid-row-start: 2; }
     #page.index .content .map svg path {
       cursor: pointer; }
       #page.index .content .map svg path:hover {
