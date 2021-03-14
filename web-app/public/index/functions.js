@@ -19,10 +19,11 @@ function loadSVG() {
     });
 }
 
-/**
- * Click method for trigger action on state click
- * @param iso String of source state
- */
-function clickOnState(iso){
-    console.log(iso);
+function saveVaccinations(){
+    const form = $('#vaccinationForm');
+    console.log(form.serialize());
+}
+
+function addRandomVaccinations(){
+    console.log('RANDOM');
 }

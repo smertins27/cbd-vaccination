@@ -1,7 +1,32 @@
 $pageBg: #E2E2E2;
 
-* {font-family: 'Open Sans', sans-serif; font-weight: 400;}
+@mixin font($weight: normal, $style: normal){
+  font-family: 'Open Sans', sans-serif;
+  font-weight: $weight;
+  font-style: $style;
+}
+@mixin boxModel(){
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+@mixin clearFix(){
+  content: ".";
+  clear: both;
+  display: block;
+  visibility: hidden;
+  height: 0;
+}
+
+* { @include font(); @include boxModel}
 body { margin: 0; padding: 0; background: $pageBg;}
+
+select, input { width: 100%; @include font(500); font: { size: 1.25rem;}; padding: 4px 8px; background: #808080; color: #f0f0f0; border-radius: 8px; border: 0;}
+input[type="number"] { -moz-appearance:textfield;}
+select { -moz-appearance: none; -webkit-appearance: none; appearance: none; border: none; -moz-padding-start: calc(10px - 3px); padding-left: 10px; outline: none; cursor: pointer; }
+select::-ms-expand {display: none;}
+select:focus::-ms-value { background-color: transparent;}
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f0f0f0;
   .content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; row-gap: 8px; padding: 16px;
@@ -16,7 +41,20 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
 
 #page.index .content { display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
   h1 { grid-column-start: 1; grid-column-end: 2; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
-  .form { grid-column-start: 1;}
+  .form { grid-column-start: 1;
+    form { width: 100%;
+      .inputs {
+        .inputField { width: 60%; float: left;
+          &:nth-of-type(2) { width: 38%; float: right;}
+        }
+        &:after { @include clearFix}
+      }
+      button { height: 32px; width: 100%; background: #3C4F6B; color: #f0f0f0; border-radius: 8px; text-align:center; line-height: 32px; border: none; font: { weight: 400; size: 1rem;} margin: 16px 0;
+        &:hover { cursor: pointer; background: #4B9486;}
+        &.disabled { background: #808080;}
+      }
+    }
+  }
   .map { width: 100%; grid-column-start: 2;
     svg path { cursor: pointer;
       &:hover { fill: #49A0E8;}

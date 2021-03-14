@@ -141,30 +141,6 @@ async function sendTrackingMessage(data) {
 // Start page
 // -------------------------------------------------------
 
-// Get list of states (from cache or db)
-async function getStates(){
-	const key = 'states';
-	let cacheData = await getFromCache(key);
-
-
-	if (cacheData){
-		console.table(`Cache hits for key=${key}, cachedata = ${cacheData}`)
-		return { result: cacheData, cached: true }
-	}else{
-		console.log(`Cache miss for key=${key}, querying database`)
-		let executeResult = await executeQuery("SELECT iso, name, population FROM states", [])
-		let data = executeResult.fetchAll()
-		if (data) {
-			console.log(`Got result=${data}, storing in cache`)
-			if (memcached)
-				await memcached.set(key, data, cacheTimeSecs);
-			return { data, cached: false }
-		} else {
-			throw "No states data found"
-		}
-	}
-}
-
 // Get popular missions (from db only)
 async function getPopular(maxCount) {
 	const query = "SELECT mission, count FROM popular ORDER BY count DESC LIMIT ?"
@@ -174,10 +150,11 @@ async function getPopular(maxCount) {
 }
 
 // Return HTML for start page
-app.get("/", (req, res) => {
+app.get('/', (req, res) => {
 	const topX = 10;
 	Promise.all([getStates()]).then(values => {
 		const states = values[0];
+		console.log(states);
 		const parameters = {
 			states: states.result,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: states.cached}
@@ -186,32 +163,73 @@ app.get("/", (req, res) => {
 	});
 })
 
-// -------------------------------------------------------
-// Get a specific mission (from cache or DB)
-// -------------------------------------------------------
+// Get infos about a specific state
+app.get('/state/info/:iso', function(req, res){
+	let isoCode = req.params.iso.toUpperCase();
+	Promise.all([getState(isoCode)]).then(result => {
+		res.send(result[0]);
+	});
+});
 
-async function getMission(mission) {
-	const query = "SELECT mission, heading, description FROM missions WHERE mission = ?"
-	const key = 'mission_' + mission
-	let cachedata = await getFromCache(key)
+app.get('state/:iso', function(req, res){
+	res.send('')
+});
 
-	if (cachedata) {
-		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`)
-		return { ...cachedata, cached: true }
-	} else {
-		console.log(`Cache miss for key=${key}, querying database`)
+// Get list of states (from cache or db)
+async function getStates(){
+	const key = 'states';
+	let cacheData = await getFromCache(key);
 
-		let data = (await executeQuery(query, [mission])).fetchOne()
+
+	if (cacheData){
+		cacheHit(key, cacheData);
+		console.table(`Cache hits for key=${key}, cachedata = ${cacheData}`)
+		return { result: cacheData, cached: true }
+	}else{
+		cacheMiss(key);
+		let executeResult = await executeQuery("SELECT iso, name, population FROM states", [])
+		let data = executeResult.fetchAll()
 		if (data) {
-			let result = { mission: data[0], heading: data[1], description: data[2] }
-			console.log(`Got result=${result}, storing in cache`)
+			console.log(`Got result=${data}, storing in cache`)
+			let result = data.map(row => ({iso: row[0], name: row[1], population: row[2]}));
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
-			return { ...result, cached: false }
+			return { result, cached: false }
 		} else {
-			throw "No data found for this mission"
+			throw "No states data found"
 		}
 	}
+}
+
+async function getState(key) {
+	const query = 'SELECT iso, name, population FROM states WHERE iso = ?';
+	let cacheData = await getFromCache(key);
+
+	if(cacheData){
+		cacheHit(key, cacheData);
+		return { ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let data = (await executeQuery(query, [key])).fetchOne();
+		if (data) {
+			let result = { iso: data[0], name: data[1], population: data[2] }
+			console.log(`Got result=${data}, storing in cache`);
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+
+			return { ...result, cached: false }
+		} else {
+			throw "No data found for this state"
+		}
+	}
+}
+
+function cacheHit(key, data){
+	console.log(`Cache hit for key=${key}, cachedata = ${JSON.stringify(data)}`)
+}
+
+function cacheMiss(key) {
+	console.log(`Cache miss for key=${key}, querying database`);
 }
 
 app.get("/missions/:mission", (req, res) => {

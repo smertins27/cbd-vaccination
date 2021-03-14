@@ -1,11 +1,50 @@
 * {
   font-family: 'Open Sans', sans-serif;
-  font-weight: 400; }
+  font-weight: normal;
+  font-style: normal;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
 
 body {
   margin: 0;
   padding: 0;
   background: #E2E2E2; }
+
+select, input {
+  width: 100%;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1.25rem;
+  padding: 4px 8px;
+  background: #808080;
+  color: #f0f0f0;
+  border-radius: 8px;
+  border: 0; }
+
+input[type="number"] {
+  -moz-appearance: textfield; }
+
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  -moz-padding-start: calc(10px - 3px);
+  padding-left: 10px;
+  outline: none;
+  cursor: pointer; }
+
+select::-ms-expand {
+  display: none; }
+
+select:focus::-ms-value {
+  background-color: transparent; }
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0; }
 
 footer {
   position: fixed;
@@ -49,6 +88,37 @@ footer {
     display: block; }
   #page.index .content .form {
     grid-column-start: 1; }
+    #page.index .content .form form {
+      width: 100%; }
+      #page.index .content .form form .inputs .inputField {
+        width: 60%;
+        float: left; }
+        #page.index .content .form form .inputs .inputField:nth-of-type(2) {
+          width: 38%;
+          float: right; }
+      #page.index .content .form form .inputs:after {
+        content: ".";
+        clear: both;
+        display: block;
+        visibility: hidden;
+        height: 0; }
+      #page.index .content .form form button {
+        height: 32px;
+        width: 100%;
+        background: #3C4F6B;
+        color: #f0f0f0;
+        border-radius: 8px;
+        text-align: center;
+        line-height: 32px;
+        border: none;
+        font-weight: 400;
+        font-size: 1rem;
+        margin: 16px 0; }
+        #page.index .content .form form button:hover {
+          cursor: pointer;
+          background: #4B9486; }
+        #page.index .content .form form button.disabled {
+          background: #808080; }
   #page.index .content .map {
     width: 100%;
     grid-column-start: 2; }
