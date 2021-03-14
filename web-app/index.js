@@ -7,17 +7,12 @@ const MemcachePlus = require('memcache-plus');
 const express = require('express')
 const path = require('path')
 
-const app = express()
-// The app uses Embedded JavaScript templates as template engine to provide a cleaner project structure
-// It serves the html files out of the /public dir
-app.engine('html', require('ejs').renderFile);
-app.set('view engine', 'html');
-
+const app = express();
 const cacheTimeSecs = 15
 
-// -------------------------------------------------------
-// Command-line options
-// -------------------------------------------------------
+/* ########################################################################## */
+/* ########################### COMMANDLINE CONFIG ########################### */
+/* ########################################################################## */
 
 let options = optionparser
 	.storeOptionsAsProperties(true)
@@ -42,9 +37,12 @@ let options = optionparser
 	.parse()
 	.opts()
 
-// -------------------------------------------------------
-// Database Configuration
-// -------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+
+
+/* ########################################################################## */
+/* ############################ DATABASE CONFIG ############################# */
+/* ########################################################################## */
 
 const dbConfig = {
 	host: options.mysqlHost,
@@ -59,11 +57,13 @@ async function executeQuery(query, data) {
 	return await session.sql(query, data).bind(data).execute()
 }
 
-// -------------------------------------------------------
-// Memcache Configuration
-// -------------------------------------------------------
+/* -------------------------------------------------------------------------- */
 
-//Connect to the memcached instances
+
+/* ########################################################################## */
+/* ########################### MEMCACHED CONFIG ############################# */
+/* ########################################################################## */
+
 let memcached = null
 let memcachedServers = []
 
@@ -105,9 +105,12 @@ async function getFromCache(key) {
 	return await memcached.get(key);
 }
 
-// -------------------------------------------------------
-// Kafka Configuration
-// -------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+
+
+/* ########################################################################## */
+/* ############################## KAFKA CONFIG ############################## */
+/* ########################################################################## */
 
 // Kafka connection
 const kafka = new Kafka({
@@ -134,19 +137,13 @@ async function sendTrackingMessage(data) {
 		]
 	})
 }
-// End
 
-// -------------------------------------------------------
-// Start page
-// -------------------------------------------------------
+/* -------------------------------------------------------------------------- */
 
-// Get popular missions (from db only)
-async function getPopular(maxCount) {
-	const query = "SELECT mission, count FROM popular ORDER BY count DESC LIMIT ?"
-	return (await executeQuery(query, [maxCount]))
-		.fetchAll()
-		.map(row => ({ mission: row[0], count: row[1] }))
-}
+
+/* ########################################################################## */
+/* ############################# APP ENDPOINTS ############################## */
+/* ########################################################################## */
 
 // Return HTML for start page
 app.get('/', (req, res) => {
@@ -163,6 +160,7 @@ app.get('/', (req, res) => {
 	});
 })
 
+// Return HTML for state page
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
@@ -181,8 +179,17 @@ app.get('/state/:iso', function(req, res){
 	});
 });
 
+/* -------------------------------------------------------------------------- */
 
-// Get list of states (from cache or db)
+
+/* ########################################################################## */
+/* ########################### DATA FROM CACHE/DB ########################### */
+/* ########################################################################## */
+
+/**
+ * Method for getting all states from database or memcached
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
 async function getStates(){
 	const key = 'states';
 	let cacheData = await getFromCache(key);
@@ -192,11 +199,11 @@ async function getStates(){
 		return { result: cacheData, cached: true }
 	}else{
 		cacheMiss(key);
-		let executeResult = await executeQuery("SELECT iso, name, population FROM states", [])
+		let executeResult = await executeQuery("SELECT iso, name FROM states", [])
 		let data = executeResult.fetchAll()
 		if (data) {
 			console.log(`Got result=${data}, storing in cache`)
-			let result = data.map(row => ({iso: row[0], name: row[1], population: row[2]}));
+			let result = data.map(row => ({iso: row[0], name: row[1]}));
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
 			return { result, cached: false }
@@ -206,7 +213,11 @@ async function getStates(){
 	}
 }
 
-// Get a specific state by key (from cache or db)
+/**
+ * Method for getting a specific state from database or memcached
+ * @param key String of the iso code
+ * @return {Promise<{iso: *, cached: boolean, name: *, population: *}|{cached: boolean}>}
+ */
 async function getState(key) {
 	const query = 'SELECT iso, name, population FROM states WHERE iso = ?';
 	let cacheData = await getFromCache(key);
@@ -230,43 +241,73 @@ async function getState(key) {
 	}
 }
 
+/* -------------------------------------------------------------------------- */
+
+
+/* ########################################################################## */
+/* ############################ HELPER FUNCTIONS ############################ */
+/* ########################################################################## */
+
+/**
+ * Helper function to dump a cache hit on the console
+ * @param key String of the cache key
+ * @param data Any
+ */
 function cacheHit(key, data){
 	console.log(`Cache hit for key=${key}, cachedata = ${JSON.stringify(data)}`)
 }
 
+/**
+ * Helper function for dump a cache miss on the console
+ * @param key String of the missed key
+ */
 function cacheMiss(key) {
 	console.log(`Cache miss for key=${key}, querying database`);
 }
 
-app.get("/missions/:mission", (req, res) => {
+/* -------------------------------------------------------------------------- */
+
+
+/* ########################################################################## */
+/* ########################### EXPRESS APP CONFIG ########################### */
+/* ########################################################################## */
+
+// The app uses Embedded JavaScript templates as template engine to provide a cleaner project structure
+// It serves the html files out of the /public dir
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
+// Serve the file from public dir
+app.use('/public', express.static(`${__dirname}/public`));
+
+app.listen(options.port, function () {
+	console.log("Node app is running at http://localhost:" + options.port)
+});
+
+/* -------------------------------------------------------------------------- */
+
+
+/* ########################################################################## */
+/* ############################# DEVELOP DUMP ############################### */
+/* ########################################################################## */
+
+/*app.get("/missions/:mission", (req, res) => {
 	let mission = req.params["mission"]
 
 	// Send the tracking message to Kafka
-	/*sendTrackingMessage({
+	sendTrackingMessage({
 		mission,
 		timestamp: Math.floor(new Date() / 1000)
 	}).then(() => console.log("Sent to kafka"))
-		.catch(e => console.log("Error sending to kafka", e))*/
+		.catch(e => console.log("Error sending to kafka", e))
 
 	// Send reply to browser
-	/*getMission(mission).then(data => {
+	getMission(mission).then(data => {
 		sendResponse(res, `<h1>${data.mission}</h1><p>${data.heading}</p>` +
 			data.description.split("\n").map(p => `<p>${p}</p>`).join("\n"),
 			data.cached
 		)
 	}).catch(err => {
 		sendResponse(res, `<h1>Error</h1><p>${err}</p>`, false)
-	})*/
-});
-
-// Serve the file from public dir
-app.use('/public', express.static(`${__dirname}/public`));
-
-
-// -------------------------------------------------------
-// Main method
-// -------------------------------------------------------
-
-app.listen(options.port, function () {
-	console.log("Node app is running at http://localhost:" + options.port)
-});
+	})
+});*/
