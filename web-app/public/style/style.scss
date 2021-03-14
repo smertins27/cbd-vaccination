@@ -1,10 +1,25 @@
-* {font-family: 'Open Sans', sans-serif;}
-body { margin: 0; padding: 0; background: #404040;}
+$pageBg: #E2E2E2;
 
-header { width: 100%; background: #202020; height: 90px;}
+* {font-family: 'Open Sans', sans-serif; font-weight: 400;}
+body { margin: 0; padding: 0; background: $pageBg;}
 
-#page_index.content { width: 50%; margin: 0 auto; display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
-  .map { width: 100%;
-    svg path { cursor: pointer; }
+footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f0f0f0;
+  .content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; row-gap: 8px; padding: 16px;
+    .head { font: {weight: 700; size: 1rem;}; text-align: center;}
+    .tail { font: {weight: 300; size: 1rem;}; text-align: center;}
+  }
+}
+
+.wrapper { width: 100%; max-width: 72rem; margin: 0 auto;
+  &.extend { max-width: 88rem;}
+}
+
+#page.index .content { display: grid; grid-template-columns: 48% 48%; grid-column-gap: 4%; padding: 32px 0;
+  h1 { grid-column-start: 1; grid-column-end: 2; font: { weight: 700; size: 2rem;} width: 100%; display: block;}
+  .form { grid-column-start: 1;}
+  .map { width: 100%; grid-column-start: 2;
+    svg path { cursor: pointer;
+      &:hover { fill: #49A0E8;}
+    }
   }
 }

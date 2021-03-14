@@ -14,20 +14,50 @@
 </head>
 <body>
 
-<header>
+<div id="page" class="index">
+    <div class="wrapper">
+        <div class="content">
 
-</header>
+            <h1>Vaccination progress of Germany</h1>
 
-<div id="page_index" class="content">
-    <div class="map">
-        <div id="svgContainer"></div>
+            <div class="form">
+                FORM
+            </div>
+
+            <div class="map">
+                <div id="svgContainer"></div>
+            </div>
+
+        </div>
     </div>
-
-    <div class="form">
-
-    </div>
-
 </div>
+
+<footer>
+    <div class="wrapper">
+        <div class="content">
+            <div class="info">
+                <div class="head">Server</div>
+                <div class="tail"><%= pageInfo.hostname %></div>
+            </div>
+            <div class="info">
+                <div class="head">Date</div>
+                <div class="tail"><%= pageInfo.date%></div>
+            </div>
+            <div class="info">
+                <div class="head"><%= pageInfo.memcachedServers.length%> Memcached Servers</div>
+                <div class="tail">
+                    <% pageInfo.memcachedServers.forEach(function(server) {%>
+                    <div class="element"><%= server %></div>
+                    <%})%>
+                </div>
+            </div>
+            <div class="info">
+                <div class="head">Cached result</div>
+                <div class="tail"><%= pageInfo.cachedState%></div>
+            </div>
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>

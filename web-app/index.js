@@ -35,7 +35,7 @@ let options = optionparser
 	// Database options
 	.option('--mysql-host <host>', 'MySQL host', 'my-app-mysql-service')
 	.option('--mysql-port <port>', 'MySQL port', 33060)
-	.option('--mysql-schema <db>', 'MySQL Schema/database', 'popular')
+	.option('--mysql-schema <db>', 'MySQL Schema/database', 'vaccination')
 	.option('--mysql-username <username>', 'MySQL username', 'root')
 	.option('--mysql-password <password>', 'MySQL password', 'mysecretpw')
 	// Misc
@@ -138,73 +138,29 @@ async function sendTrackingMessage(data) {
 // End
 
 // -------------------------------------------------------
-// HTML helper to send a response to the client
-// -------------------------------------------------------
-
-function sendResponse(res, html, cachedResult) {
-	res.send(`<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Big Data Use-Case Demo</title>
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
-			<script>
-				function fetchRandomMissions() {
-					const maxRepetitions = Math.floor(Math.random() * 200)
-					document.getElementById("out").innerText = "Fetching " + maxRepetitions + " random missions, see console output"
-					for(var i = 0; i < maxRepetitions; ++i) {
-						const missionId = Math.floor(Math.random() * ${numberOfMissions})
-						console.log("Fetching mission id " + missionId)
-						fetch("/missions/sts-" + missionId, {cache: 'no-cache'})
-					}
-				}
-			</script>
-		</head>
-		<body>
-			<h1>World vaccination progress</h1>
-			<p>
-				<a href="javascript: fetchRandomMissions();">Randomly fetch some missions</a>
-				<span id="out"></span>
-			</p>
-			${html}
-			<hr>
-			<h2>Information about the generated page</h4>
-			<ul>
-				<li>Server: ${os.hostname()}</li>
-				<li>Date: ${new Date()}</li>
-				<li>Using ${memcachedServers.length} memcached Servers: ${memcachedServers}</li>
-				<li>Cached result: ${cachedResult}</li>
-			</ul>
-		</body>
-	</html>
-	`)
-}
-
-// -------------------------------------------------------
 // Start page
 // -------------------------------------------------------
 
-// Get list of missions (from cache or db)
-async function getMissions() {
-	const key = 'missions'
-	let cachedata = await getFromCache(key)
+// Get list of states (from cache or db)
+async function getStates(){
+	const key = 'states';
+	let cacheData = await getFromCache(key);
 
-	if (cachedata) {
-		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`)
-		return { result: cachedata, cached: true }
-	} else {
+
+	if (cacheData){
+		console.table(`Cache hits for key=${key}, cachedata = ${cacheData}`)
+		return { result: cacheData, cached: true }
+	}else{
 		console.log(`Cache miss for key=${key}, querying database`)
-		let executeResult = await executeQuery("SELECT mission FROM missions", [])
+		let executeResult = await executeQuery("SELECT iso, name, population FROM states", [])
 		let data = executeResult.fetchAll()
 		if (data) {
-			let result = data.map(row => row[0])
-			console.log(`Got result=${result}, storing in cache`)
+			console.log(`Got result=${data}, storing in cache`)
 			if (memcached)
-				await memcached.set(key, result, cacheTimeSecs);
-			return { result, cached: false }
+				await memcached.set(key, data, cacheTimeSecs);
+			return { data, cached: false }
 		} else {
-			throw "No missions data found"
+			throw "No states data found"
 		}
 	}
 }
@@ -220,31 +176,14 @@ async function getPopular(maxCount) {
 // Return HTML for start page
 app.get("/", (req, res) => {
 	const topX = 10;
-
-	res.render(path.join(__dirname, 'public/index/index.html'));
-
-	/*Promise.all([getMissions(), getPopular(topX)]).then(values => {
-		const missions = values[0]
-		const popular = values[1]
-
-		const missionsHtml = missions.result
-			.map(m => `<a href='missions/${m}'>${m}</a>`)
-			.join(", ")
-
-		const popularHtml = popular
-			.map(pop => `<li> <a href='missions/${pop.mission}'>${pop.mission}</a> (${pop.count} views) </li>`)
-			.join("\n")
-
-		const html = `
-			<h1>Top ${topX} Missions</h1>		
-			<p>
-				<ol style="margin-left: 2em;"> ${popularHtml} </ol> 
-			</p>
-			<h1>All Missions</h1>
-			<p> ${missionsHtml} </p>
-		`
-		sendResponse(res, html, missions.cached)
-	})*/
+	Promise.all([getStates()]).then(values => {
+		const states = values[0];
+		const parameters = {
+			states: states.result,
+			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: states.cached}
+		}
+		res.render(path.join(__dirname, 'public/index/index.html'), parameters);
+	});
 })
 
 // -------------------------------------------------------
@@ -286,14 +225,14 @@ app.get("/missions/:mission", (req, res) => {
 		.catch(e => console.log("Error sending to kafka", e))*/
 
 	// Send reply to browser
-	getMission(mission).then(data => {
+	/*getMission(mission).then(data => {
 		sendResponse(res, `<h1>${data.mission}</h1><p>${data.heading}</p>` +
 			data.description.split("\n").map(p => `<p>${p}</p>`).join("\n"),
 			data.cached
 		)
 	}).catch(err => {
 		sendResponse(res, `<h1>Error</h1><p>${err}</p>`, false)
-	})
+	})*/
 });
 
 // Serve the file from public dir
