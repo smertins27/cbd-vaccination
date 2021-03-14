@@ -27,6 +27,9 @@ select, input {
 
 input[type="number"] {
   -moz-appearance: textfield; }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"] input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0; }
 
 select {
   -moz-appearance: none;
@@ -37,16 +40,33 @@ select {
   padding-left: 10px;
   outline: none;
   cursor: pointer; }
+  select::-ms-expand {
+    display: none; }
+  select:focus::-ms-value {
+    background-color: transparent; }
 
-select::-ms-expand {
-  display: none; }
-
-select:focus::-ms-value {
-  background-color: transparent; }
-
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0; }
+button, .button {
+  height: 32px;
+  width: 100%;
+  background: #3C4F6B;
+  color: #f0f0f0;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 32px;
+  border: none;
+  font-weight: 400;
+  font-size: 1rem;
+  margin: 16px 0; }
+  button:hover, .button:hover {
+    cursor: pointer;
+    background: #4B9486; }
+  button.disabled, .button.disabled {
+    background: #808080; }
+    button.disabled:hover, .button.disabled:hover {
+      cursor: not-allowed; }
+  button:disabled, .button:disabled {
+    cursor: not-allowed;
+    background: #808080; }
 
 footer {
   position: fixed;
@@ -95,40 +115,20 @@ footer {
   grid-row-start: 2; }
   #page.index .content .form form {
     width: 100%; }
-    #page.index .content .form form .inputs .inputField {
-      width: 60%;
-      float: left; }
-      #page.index .content .form form .inputs .inputField:nth-of-type(2) {
-        width: 38%;
-        float: right; }
-    #page.index .content .form form .inputs:after {
-      content: ".";
-      clear: both;
-      display: block;
-      visibility: hidden;
-      height: 0; }
-    #page.index .content .form form button, #page.index .content .form form .button {
-      height: 32px;
-      width: 100%;
-      background: #3C4F6B;
-      color: #f0f0f0;
-      border-radius: 8px;
-      text-align: center;
-      line-height: 32px;
-      border: none;
-      font-weight: 400;
-      font-size: 1rem;
-      margin: 16px 0; }
-      #page.index .content .form form button:hover, #page.index .content .form form .button:hover {
-        cursor: pointer;
-        background: #4B9486; }
-      #page.index .content .form form button.disabled, #page.index .content .form form .button.disabled {
-        background: #808080; }
-        #page.index .content .form form button.disabled:hover, #page.index .content .form form .button.disabled:hover {
-          cursor: not-allowed; }
-      #page.index .content .form form button:disabled, #page.index .content .form form .button:disabled {
-        cursor: not-allowed;
-        background: #808080; }
+    #page.index .content .form form .inputs {
+      margin: 0 0 8px 0; }
+      #page.index .content .form form .inputs .inputField {
+        width: 60%;
+        float: left; }
+        #page.index .content .form form .inputs .inputField:nth-of-type(2) {
+          width: 38%;
+          float: right; }
+      #page.index .content .form form .inputs:after {
+        content: ".";
+        clear: both;
+        display: block;
+        visibility: hidden;
+        height: 0; }
 #page.index .content .map {
   width: 100%;
   grid-column-start: 1;

@@ -41,9 +41,20 @@
                             </label>
                         </div>
                     </div>
+                    <div class="inputField">
+                        <label>
+                            Vaccine
+                            <%=  %>
+                            <select name="vaccine">
+                                <% vaccines.forEach(function(vaccine) { %>
+                                <option value="<%= vaccine.code %>"><%= vaccine.name %></option>
+                                <% })%>
+                            </select>
+                        </label>
+                    </div>
                     <button type="submit" class="disabled" id="vacFormSubmit" disabled>Add vaccinations</button>
-                    <button type="button" onclick="addRandomVaccinations()">Add random vaccinations</button>
                 </form>
+                <button type="button" onclick="addRandomVaccinations()">Add random vaccinations</button>
             </div>
 
             <div class="map">

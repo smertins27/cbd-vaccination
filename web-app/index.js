@@ -148,10 +148,12 @@ async function sendTrackingMessage(data) {
 // Return HTML for start page
 app.get('/', (req, res) => {
 	const topX = 10;
-	Promise.all([getStates()]).then(values => {
+	Promise.all([getStates(), getVaccines()]).then(values => {
 		const states = values[0];
+		const vaccines = values[1];
 		const parameters = {
 			states: states.result,
+			vaccines: vaccines.result,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: states.cached}
 		}
 		res.render(path.join(__dirname, 'public/overview/overview.html'), parameters);
@@ -209,6 +211,33 @@ async function getStates(){
 			return { result, cached: false }
 		} else {
 			throw "No states data found"
+		}
+	}
+}
+
+/**
+ * Method for getting all available vaccines from database or memcached
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
+async function getVaccines(){
+	const key = 'vaccines';
+	let cacheData = await getFromCache(key);
+
+	if (cacheData){
+		cacheHit(key, cacheData);
+		return { result: cacheData, cached: true }
+	}else{
+		cacheMiss(key);
+		let executeResult = await executeQuery("SELECT code, name FROM vaccines", [])
+		let data = executeResult.fetchAll()
+		if (data) {
+			console.log(`Got result=${data}, storing in cache`)
+			let result = data.map(row => ({code: row[0], name: row[1]}));
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+			return { result, cached: false }
+		} else {
+			throw "No vaccines data found"
 		}
 	}
 }

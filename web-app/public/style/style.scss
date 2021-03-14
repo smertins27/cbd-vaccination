@@ -25,11 +25,21 @@ body { margin: 0; padding: 0; background: $pageBg;}
 select, input { width: 100%; @include font(500); font: { size: 1.25rem;}; padding: 4px 8px; background: #808080; color: #f0f0f0; border-radius: 8px; border: 0;
   &::placeholder { color: $disabled;}
 }
-input[type="number"] { -moz-appearance:textfield;}
-select { -moz-appearance: none; -webkit-appearance: none; appearance: none; border: none; -moz-padding-start: calc(10px - 3px); padding-left: 10px; outline: none; cursor: pointer; }
-select::-ms-expand {display: none;}
-select:focus::-ms-value { background-color: transparent;}
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance:textfield;
+  &::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+}
+select { -moz-appearance: none; -webkit-appearance: none; appearance: none; border: none; -moz-padding-start: calc(10px - 3px); padding-left: 10px; outline: none; cursor: pointer;
+  &::-ms-expand {display: none;}
+  &:focus::-ms-value { background-color: transparent;}
+}
+
+button, .button { height: 32px; width: 100%; background: #3C4F6B; color: #f0f0f0; border-radius: 8px; text-align:center; line-height: 32px; border: none; font: { weight: 400; size: 1rem;} margin: 16px 0;
+  &:hover { cursor: pointer; background: #4B9486;}
+  &.disabled { background: $disabled;
+    &:hover { cursor: not-allowed;}
+  }
+  &:disabled { cursor: not-allowed; background: $disabled;}
+}
 
 footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f0f0f0;
   .content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; row-gap: 8px; padding: 16px;
@@ -49,18 +59,11 @@ footer { position: fixed; bottom: 0; width: 100%; background: #404040; color: #f
 #page.index .content {
   .form { grid-column-start: 2; grid-row-start: 2;
     form { width: 100%;
-      .inputs {
+      .inputs { margin: 0 0 8px 0;
         .inputField { width: 60%; float: left;
           &:nth-of-type(2) { width: 38%; float: right;}
         }
         &:after { @include clearFix}
-      }
-      button, .button { height: 32px; width: 100%; background: #3C4F6B; color: #f0f0f0; border-radius: 8px; text-align:center; line-height: 32px; border: none; font: { weight: 400; size: 1rem;} margin: 16px 0;
-        &:hover { cursor: pointer; background: #4B9486;}
-        &.disabled { background: $disabled;
-          &:hover { cursor: not-allowed;}
-        }
-        &:disabled { cursor: not-allowed; background: $disabled;}
       }
     }
   }
