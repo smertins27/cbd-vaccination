@@ -5,8 +5,14 @@ const { Kafka } = require('kafkajs')
 const mysqlx = require('@mysql/xdevapi');
 const MemcachePlus = require('memcache-plus');
 const express = require('express')
+const path = require('path')
 
 const app = express()
+// The app uses Embedded JavaScript templates as template engine to provide a cleaner project structure
+// It serves the html files out of the /public dir
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
 const cacheTimeSecs = 15
 const numberOfMissions = 30
 
@@ -88,7 +94,7 @@ async function getMemcachedServersFromDns() {
 }
 
 //Initially try to connect to the memcached servers, then each 5s update the list
-getMemcachedServersFromDns()
+getMemcachedServersFromDns().then();
 setInterval(() => getMemcachedServersFromDns(), options.memcachedUpdateInterval)
 
 //Get data from cache if a cache exists yet
@@ -214,7 +220,10 @@ async function getPopular(maxCount) {
 // Return HTML for start page
 app.get("/", (req, res) => {
 	const topX = 10;
-	Promise.all([getMissions(), getPopular(topX)]).then(values => {
+
+	res.render(path.join(__dirname, 'public/index.html'));
+
+	/*Promise.all([getMissions(), getPopular(topX)]).then(values => {
 		const missions = values[0]
 		const popular = values[1]
 
@@ -235,7 +244,7 @@ app.get("/", (req, res) => {
 			<p> ${missionsHtml} </p>
 		`
 		sendResponse(res, html, missions.cached)
-	})
+	})*/
 })
 
 // -------------------------------------------------------
@@ -270,11 +279,11 @@ app.get("/missions/:mission", (req, res) => {
 	let mission = req.params["mission"]
 
 	// Send the tracking message to Kafka
-	sendTrackingMessage({
+	/*sendTrackingMessage({
 		mission,
 		timestamp: Math.floor(new Date() / 1000)
 	}).then(() => console.log("Sent to kafka"))
-		.catch(e => console.log("Error sending to kafka", e))
+		.catch(e => console.log("Error sending to kafka", e))*/
 
 	// Send reply to browser
 	getMission(mission).then(data => {
@@ -286,6 +295,9 @@ app.get("/missions/:mission", (req, res) => {
 		sendResponse(res, `<h1>Error</h1><p>${err}</p>`, false)
 	})
 });
+
+// Serve the file from public dir
+app.use(express.static('/public'));
 
 // -------------------------------------------------------
 // Main method

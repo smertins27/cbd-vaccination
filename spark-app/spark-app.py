@@ -28,13 +28,13 @@ kafkaMessages = spark \
     .load()
 
 # Define schema of tracking data
-trackingMessageSchema = StructType() \
+""" trackingMessageSchema = StructType() \
     .add("mission", StringType()) \
-    .add("timestamp", IntegerType())
+    .add("timestamp", IntegerType()) """
 
 # Example Part 3
 # Convert value: binary -> JSON -> fields + parsed timestamp
-trackingMessages = kafkaMessages.select(
+""" trackingMessages = kafkaMessages.select(
     # Extract 'value' from Kafka message (i.e., the tracking data)
     from_json(
         column("value").cast("string"),
@@ -50,33 +50,33 @@ trackingMessages = kafkaMessages.select(
     column("json.*")
 ) \
     .withColumnRenamed('json.mission', 'mission') \
-    .withWatermark("parsed_timestamp", windowDuration)
+    .withWatermark("parsed_timestamp", windowDuration) """
 
 # Example Part 4
 # Compute most popular slides
-popular = trackingMessages.groupBy(
+""" popular = trackingMessages.groupBy(
     window(
         column("parsed_timestamp"),
         windowDuration,
         slidingDuration
     ),
     column("mission")
-).count().withColumnRenamed('count', 'views')
+).count().withColumnRenamed('count', 'views') """
 
 # Example Part 5
 # Start running the query; print running counts to the console
-consoleDump = popular \
+""" consoleDump = popular \
     .writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
     .format("console") \
     .option("truncate", "false") \
-    .start()
+    .start() """
 
 # Example Part 6
 
 
-def saveToDatabase(batchDataframe, batchId):
+""" def saveToDatabase(batchDataframe, batchId):
     # Define function to save a dataframe to mysql
     def save_to_db(iterator):
         # Connect to database and use schema
@@ -93,16 +93,16 @@ def saveToDatabase(batchDataframe, batchId):
         session.close()
 
     # Perform batch UPSERTS per data partition
-    batchDataframe.foreachPartition(save_to_db)
+    batchDataframe.foreachPartition(save_to_db) """
 
 # Example Part 7
 
 
-dbInsertStream = popular.writeStream \
+""" dbInsertStream = popular.writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
     .foreachBatch(saveToDatabase) \
-    .start()
+    .start() """
 
 # Wait for termination
 spark.streams.awaitAnyTermination()
