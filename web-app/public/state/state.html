@@ -15,7 +15,12 @@
 <body>
 
 <div id="page" class="state">
-    <div class="wrapper"></div>
+    <div class="wrapper">
+        <div class="content">
+            <h1>Vaccination progess of <%= state.name %></h1>
+            <div class="map" style="background-image: url(../public/state/images/<%= state.iso %>.svg)"></div>
+        </div>
+    </div>
 </div>
 
 <footer>

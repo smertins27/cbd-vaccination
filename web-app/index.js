@@ -168,8 +168,9 @@ app.get('/state/:iso', function(req, res){
 
 	Promise.all([getState(isoCode)]).then(values => {
 		const state = values[0];
+
 		const parameters = {
-			state: state.result,
+			state,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
 		}
 		console.log(state);
