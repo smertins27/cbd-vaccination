@@ -221,7 +221,7 @@ async function getPopular(maxCount) {
 app.get("/", (req, res) => {
 	const topX = 10;
 
-	res.render(path.join(__dirname, 'public/index.html'));
+	res.render(path.join(__dirname, 'public/index/index.html'));
 
 	/*Promise.all([getMissions(), getPopular(topX)]).then(values => {
 		const missions = values[0]
@@ -297,7 +297,7 @@ app.get("/missions/:mission", (req, res) => {
 });
 
 // Serve the file from public dir
-app.use(express.static('/public'));
+app.use(express.static('public'));
 
 // -------------------------------------------------------
 // Main method
