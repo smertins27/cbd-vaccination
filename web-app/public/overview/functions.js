@@ -10,7 +10,7 @@ $('document').ready(() => {
 function loadSVG() {
     $.ajax({
         type: 'GET',
-        url: 'index/map_germany.svg',
+        url: 'public/overview/map_germany.svg',
         data: '',
         dataType: 'html',
         success: function (data) {
@@ -51,4 +51,8 @@ function validateForm(){
             $submitBtn.addClass('disabled');
         }
     });
+}
+
+function clickOnState(iso){
+    location.href = '/state/' + iso;
 }

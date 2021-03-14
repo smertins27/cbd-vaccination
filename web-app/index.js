@@ -14,7 +14,6 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 const cacheTimeSecs = 15
-const numberOfMissions = 30
 
 // -------------------------------------------------------
 // Command-line options
@@ -154,36 +153,41 @@ app.get('/', (req, res) => {
 	const topX = 10;
 	Promise.all([getStates()]).then(values => {
 		const states = values[0];
-		console.log(states);
 		const parameters = {
 			states: states.result,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: states.cached}
 		}
-		res.render(path.join(__dirname, 'public/index/index.html'), parameters);
+		res.render(path.join(__dirname, 'public/overview/overview.html'), parameters);
+	}).catch(e => {
+		console.error(e);
 	});
 })
 
-// Get infos about a specific state
-app.get('/state/info/:iso', function(req, res){
+app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
-	Promise.all([getState(isoCode)]).then(result => {
-		res.send(result[0]);
+
+	Promise.all([getState(isoCode)]).then(values => {
+		const state = values[0];
+		const parameters = {
+			state: state.result,
+			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
+		}
+		console.log(state);
+		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
+
+	}).catch(e => {
+		console.error(e);
 	});
 });
 
-app.get('state/:iso', function(req, res){
-	res.send('')
-});
 
 // Get list of states (from cache or db)
 async function getStates(){
 	const key = 'states';
 	let cacheData = await getFromCache(key);
 
-
 	if (cacheData){
 		cacheHit(key, cacheData);
-		console.table(`Cache hits for key=${key}, cachedata = ${cacheData}`)
 		return { result: cacheData, cached: true }
 	}else{
 		cacheMiss(key);
@@ -201,6 +205,7 @@ async function getStates(){
 	}
 }
 
+// Get a specific state by key (from cache or db)
 async function getState(key) {
 	const query = 'SELECT iso, name, population FROM states WHERE iso = ?';
 	let cacheData = await getFromCache(key);
@@ -254,7 +259,8 @@ app.get("/missions/:mission", (req, res) => {
 });
 
 // Serve the file from public dir
-app.use(express.static('public'));
+app.use('/public', express.static(`${__dirname}/public`));
+
 
 // -------------------------------------------------------
 // Main method
