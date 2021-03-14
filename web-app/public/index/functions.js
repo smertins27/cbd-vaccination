@@ -19,11 +19,36 @@ function loadSVG() {
     });
 }
 
+/**
+ * Submit function for adding a specific amount of vaccinations for a state
+ */
 function saveVaccinations(){
     const form = $('#vaccinationForm');
-    console.log(form.serialize());
+    console.log(form.serializeArray());
 }
 
+/**
+ * Click function for adding random vaccinations
+ */
 function addRandomVaccinations(){
     console.log('RANDOM');
+}
+
+/**
+ * Change event triggered.
+ * Little function for validate form and dis- or enable the submit button
+ */
+function validateForm(){
+    const $form = $('#vaccinationForm');
+    const $submitBtn = $('#vaccinationForm button[type="submit"]');
+    const values = $form.serializeArray();
+    values.forEach(value => {
+        if (value.value !== ''){
+           $submitBtn.prop('disabled', false);
+           $submitBtn.removeClass('disabled');
+        }else{
+            $submitBtn.prop('disabled', true);
+            $submitBtn.addClass('disabled');
+        }
+    });
 }

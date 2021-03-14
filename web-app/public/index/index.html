@@ -11,6 +11,10 @@
     <!-- External file for js functions -->
     <script type="application/javascript" src="index/functions.js"></script>
 
+    <script type="application/javascript">
+
+    </script>
+
 </head>
 <body>
 
@@ -21,7 +25,7 @@
             <h1>Vaccination progress of Germany</h1>
 
             <div id="stateVaccinations" class="form">
-                <form id="vaccinationForm" onsubmit="saveVaccinations()" action="javascript:void(0)">
+                <form id="vaccinationForm" onchange="validateForm()" onsubmit="saveVaccinations()" action="javascript:void(0)">
                     <div class="inputs">
                         <div class="inputField">
                             <label>
@@ -37,11 +41,11 @@
                         <div class="inputField">
                             <label>
                                 Vaccination count
-                                <input type="number" placeholder="500" value="500" min="10" name="vac_count">
+                                <input type="number" placeholder="500" name="vac_count">
                             </label>
                         </div>
                     </div>
-                    <button type="submit">Add vaccinations</button>
+                    <button type="submit" class="disabled" id="vacFormSubmit" disabled>Add vaccinations</button>
                     <button type="button" onclick="addRandomVaccinations()">Add random vaccinations</button>
                 </form>
             </div>
