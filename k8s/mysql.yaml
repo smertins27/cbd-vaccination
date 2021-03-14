@@ -13,6 +13,23 @@ data:
       PRIMARY KEY (`iso`)
     );
 
+    DROP TABLE IF EXISTS `vaccination_progress`;
+    CREATE TABLE `vaccination_progress` (
+      `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+      `iso` varchar(2) DEFAULT NULL,
+      `vac_amount` bigint DEFAULT NULL,
+      `vaccine` varchar(3) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `id` (`id`)
+    );
+
+    DROP TABLE IF EXISTS `vaccines`;
+    CREATE TABLE `vaccines` (
+      `code` varchar(3) NOT NULL,
+      `name` varchar(255) DEFAULT NULL,
+      PRIMARY KEY (`code`)
+    );
+
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BB', 'Brandenburg', 2522000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BE', 'Berlin', 3669000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BW', 'Baden-Wuettenberg', 11100000);
@@ -29,6 +46,13 @@ data:
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('SN', 'Sachsen', 4072000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('ST', 'Sachsen-Anhalt', 2195000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('TH', 'Tuehringen', 2133000);
+
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('azc', 'AstraZeneca');
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('bnt', 'BioNTech/Pifzer');
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('cuv', 'CureVac');
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('gsk', 'Sanofi/GSK');
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('jaj', 'Johnson & Johnson');
+    INSERT INTO `vaccines` (`code`, `name`) VALUES ('mdn', 'Moderna');
 
 ---
 apiVersion: apps/v1
