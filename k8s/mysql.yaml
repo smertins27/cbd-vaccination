@@ -5,41 +5,42 @@ metadata:
   name: mysql-deployment-init-configmap
 data:
   mysql-init.sql: |
-    DROP TABLE IF EXISTS `states`;
-    CREATE TABLE `states` (
-      `iso` varchar(2) NOT NULL,
-      `name` varchar(255) NOT NULL,
-      `population` bigint NOT NULL,
-      PRIMARY KEY (`iso`)
-    );
+    DROP TABLE IF EXISTS states;
+    CREATE TABLE states (
+      iso        varchar(2) NOT NULL,
+      name       varchar(255) NOT NULL,
+      population bigint(20) NOT NULL,
+      PRIMARY KEY (iso),
+      UNIQUE INDEX (iso));
 
-    DROP TABLE IF EXISTS `vaccination_progress`;
-    CREATE TABLE `vaccination_progress` (
-      `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-      `iso` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-      `vac_amount` bigint NOT NULL,
-      `vaccine` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `id` (`id`)
-    );
-
-    DROP TABLE IF EXISTS `vaccinations`;
-    CREATE TABLE `vaccinations` (
-      `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-      `state` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-      `vaccine` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-      `vac_amount` bigint NOT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `id` (`id`)
-    );
+    DROP TABLE IF EXISTS vaccines;
+    CREATE TABLE vaccines (
+      code varchar(3) NOT NULL,
+      name varchar(255) NOT NULL,
+      PRIMARY KEY (code),
+      UNIQUE INDEX (code));
 
 
-    DROP TABLE IF EXISTS `vaccines`;
-    CREATE TABLE `vaccines` (
-      `code` varchar(3) NOT NULL,
-      `name` varchar(255) DEFAULT NULL,
-      PRIMARY KEY (`code`)
-    );
+    DROP TABLE IF EXISTS vaccination_progress;
+    CREATE TABLE vaccination_progress (
+      id           bigint(20) NOT NULL AUTO_INCREMENT,
+      percentage   float NOT NULL,
+      statesiso    varchar(2) NOT NULL,
+      vaccinescode varchar(3) NOT NULL,
+      PRIMARY KEY (id),
+      UNIQUE INDEX (id));
+
+
+    DROP TABLE IF EXISTS vaccinations;
+    CREATE TABLE vaccinations (
+      code         varchar(3) NOT NULL,
+      name         varchar(255) NOT NULL,
+      vaccinescode varchar(3) NOT NULL,
+      statesiso    varchar(2) NOT NULL,
+      vac_amount   int(10) NOT NULL,
+      PRIMARY KEY (code),
+      UNIQUE INDEX (code));
+
 
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BB', 'Brandenburg', 2522000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BE', 'Berlin', 3669000);
