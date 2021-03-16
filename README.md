@@ -1,15 +1,3 @@
-# Required software
-To develop and deploy the project in a local Kubernetes some software requirements needs to be installed.
-This case shows the commands for macOS
-
-Minikube: `brew install minikube`
-
-Skaffold: `brew install skaffold`
-
-Helm: `brew install helm`
-
-Enable ingress `minikube addons enable ingress`
-
 # Use Case: World vaccination progress
 
 ## Database Design
@@ -18,7 +6,7 @@ Mainly we are using four tables, which holds the complete data of the project.
 
 The tables `states` and `vaccines` are preloaded with content to ensure that the application runs properly.
 
-The remaining tables are feed with dynamic user generated data, which are calculated and inserted via kafka and batch processing.
+The remaining tables are feed with dynamic user generated batch calculated data, which are calculated and inserted via kafka and batch processing.
 
 ![Database Design](https://raw.githubusercontent.com/smertins27/cbd-vaccination/master/documentation/images/MySQL_Database.jpg)
 
@@ -36,6 +24,18 @@ To simulate the Big Data character and to stress the batch processing a hugh amo
 ```
 
 ## Prerequisites
+
+### Required software
+To develop and deploy the project in a local Kubernetes some software requirements needs to be installed.
+This case shows the commands for macOS
+
+Minikube: `brew install minikube`
+
+Skaffold: `brew install skaffold`
+
+Helm: `brew install helm`
+
+Enable ingress `minikube addons enable ingress`
 
 A running Strimzi.io Kafka operator
 
