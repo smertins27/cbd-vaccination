@@ -33,13 +33,14 @@ data:
 
     DROP TABLE IF EXISTS vaccinations;
     CREATE TABLE vaccinations (
-      code         varchar(3) NOT NULL,
-      name         varchar(255) NOT NULL,
+      id           bigint(20) NOT NULL AUTO_INCREMENT,
       vaccinescode varchar(3) NOT NULL,
       statesiso    varchar(2) NOT NULL,
       vac_amount   int(10) NOT NULL,
-      PRIMARY KEY (code),
-      UNIQUE INDEX (code));
+      PRIMARY KEY (id),
+      UNIQUE INDEX (id));
+
+
 
 
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BB', 'Brandenburg', 2522000);

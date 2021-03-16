@@ -12,6 +12,29 @@ Enable ingress `minikube addons enable ingress`
 
 # Use Case: World vaccination progress
 
+## Database Design
+The following images gives a slight overview about our database structure.
+Mainly we are using four tables, which holds the complete data of the project.
+
+The tables `states` and `vaccines` are preloaded with content to ensure that the application runs properly.
+
+The remaining tables are feed with dynamic user generated data, which are calculated and inserted via kafka and batch processing.
+
+![Database Design](https://raw.githubusercontent.com/smertins27/cbd-vaccination/master/documentation/images/MySQL_Database.jpg)
+
+## Generating data
+
+The user generated data consists of `vaccinescode`, `statesiso` and `vac_amount` which are filled with information from a form.
+To simulate the Big Data character and to stress the batch processing a hugh amount of data entries can be generated randomly by a Javascript function.  
+
+```
+{ 
+	vaccinescode: 'bnt', 
+	statesiso: 'NI',
+	vac_amount: '1500',
+}
+```
+
 ## Prerequisites
 
 A running Strimzi.io Kafka operator

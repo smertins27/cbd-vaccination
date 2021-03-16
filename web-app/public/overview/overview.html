@@ -27,7 +27,7 @@
                             <label>
                                 Federal State
                                 <%=  %>
-                                <select name="state">
+                                <select name="statesiso">
                                     <% states.forEach(function(state) { %>
                                     <option value="<%= state.iso %>"><%= state.name %></option>
                                     <% })%>
@@ -37,7 +37,7 @@
                         <div class="inputField">
                             <label>
                                 Vaccination count
-                                <input type="number" placeholder="500" name="vac_count">
+                                <input type="number" placeholder="500" name="vac_amount">
                             </label>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         <label>
                             Vaccine
                             <%=  %>
-                            <select name="vaccine">
+                            <select name="vaccinescode">
                                 <% vaccines.forEach(function(vaccine) { %>
                                 <option value="<%= vaccine.code %>"><%= vaccine.name %></option>
                                 <% })%>
