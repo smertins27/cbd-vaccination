@@ -40,4 +40,10 @@ function reset(){
   start
 }
 
+# Stop local minikube kubernetes deployment
+function stop(){
+  clear
+  minikube stop
+}
+
 $cmd $@
