@@ -10,7 +10,7 @@ function kubernetesMac(){
 # Launch minikube from a linux system and start setup of minikube
 function kubernetesLinux(){
   unset KUBECONFIG
-  minikube start --memory 6144 --cpus 4 --vm-driver=hyperkit
+  minikube start --memory 6144 --cpus 4 --vm-driver=none
   setup
 }
 
