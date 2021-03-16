@@ -16,12 +16,23 @@ data:
     DROP TABLE IF EXISTS `vaccination_progress`;
     CREATE TABLE `vaccination_progress` (
       `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-      `iso` varchar(2) DEFAULT NULL,
-      `vac_amount` bigint DEFAULT NULL,
-      `vaccine` varchar(3) DEFAULT NULL,
+      `iso` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+      `vac_amount` bigint NOT NULL,
+      `vaccine` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
       PRIMARY KEY (`id`),
       UNIQUE KEY `id` (`id`)
     );
+
+    DROP TABLE IF EXISTS `vaccinations`;
+    CREATE TABLE `vaccinations` (
+      `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+      `state` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+      `vaccine` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+      `vac_amount` bigint NOT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `id` (`id`)
+    );
+
 
     DROP TABLE IF EXISTS `vaccines`;
     CREATE TABLE `vaccines` (
