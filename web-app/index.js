@@ -305,6 +305,39 @@ async function getVaccines(){
 }
 
 /**
+ * Method for database query checking if specific state with specific vaccine is in database
+ * @param {*} state String of the iso code
+ * @param {*} vaccinescode String of the vaccinescode
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
+
+async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
+	const key = state.concat(vaccinescode);
+	const progressQuery = 'SELECT id, percentage FROM vaccination_progress WHERE statesiso = ? AND vaccinescode = ?';
+	const query = 'SELECT id, vac_amount FROM vaccinations WHERE statesiso = ? AND vaccinescode = ?';
+	let cacheData = await getFromCache(key);
+	if(cacheData){
+		cacheHit(key, cacheData);
+		return { ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let data = (await executeQuery(progressQuery, [state, vaccinescode])).fetchOne();
+		let vacData = (await executeQuery(query, [state, vaccinescode])).fetchOne();
+		
+		if (data && vacData){
+			let result = { progressId: data[0], dataPercentage: data[1], vacId: vacData[0], dataVacAmount: vacData[1] }
+			console.log(`Got result=${data, vacData}, storing in cache`);
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+
+			return { ...result, cached: false }
+		} else {
+			return {}
+		}
+	}
+}
+
+/**
  * Method for getting a specific state from database or memcached
  * @param key String of the iso code
  * @return {Promise<{iso: *, cached: boolean, name: *, population: *}|{cached: boolean}>}
