@@ -179,6 +179,42 @@ app.get('/state/:iso', function(req, res){
 	});
 });
 
+
+// Post Data to Kafka 
+app.use(express.json())
+ app.post('/vaccinations', function(req, res){
+	const data = req.body;
+	res.send(true);
+	Promise.all([getPopulationOfState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
+		const pop = values[0].population;
+		const vacAmount = parseInt(data.vac_amount);
+		const per = vacAmount / pop;
+		const percent = per.toFixed(6);
+		if (values[1].vacId) { 
+			const progressId = values[1].progressId;
+			const percentageInDb = values[1].dataPercentage;
+			const vacId = values[1].vacId;
+			const vacAmountInDb = values[1].dataVacAmount;
+			data.progressId = parseInt(progressId);
+			data.vacId = parseInt(vacId);
+			data.vacAmountInDb = parseFloat(vacAmountInDb);
+			data.percentageInDb = parseFloat(percentageInDb);
+		}
+		else{
+			data.vacAmountInDb = 0;
+			data.percentageInDb = 0;
+		}
+		data.vac_amount = vacAmount;
+		data.percent = parseFloat(percent);
+		console.log(data);
+		sendVaccinationMessage(data).then(() => console.log("Sent to kafka"))
+		.catch(e => console.log("Error sending to kafka", e)) 
+	}).catch(e => { // Catch error to prevent server crash
+		console.error(e);
+	});
+		
+}) 
+
 /* -------------------------------------------------------------------------- */
 
 
