@@ -1,6 +1,8 @@
 // Event which is triggered when document is ready
 $('document').ready(() => {
     loadSVG();
+    const states = document.getElementById("states");
+    console.log(states.name);
 })
 
 /**
@@ -19,19 +21,54 @@ function loadSVG() {
     });
 }
 
+
+function postData(data){
+
+    $.ajax({
+        type: 'POST',
+        url: '/vaccinations',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function (msg) {
+        
+        },
+        error: function(jqXHR, textStatus, err){
+        
+        }
+    })
+}
+
+
+
+
 /**
  * Submit function for adding a specific amount of vaccinations for a state
  */
 function saveVaccinations(){
     const form = $('#vaccinationForm');
-    console.log(form.serializeArray());
+    vaccinations = form.serializeArray();
+    var result = {};
+    var timestamp = Math.floor(new Date() / 1000)
+    for (let key in vaccinations) {
+     result[vaccinations[key].name] = vaccinations[key].value;
+    }
+    result["timestamp"] = timestamp;
+    result["percent"] = 0;
+    result["progressId"] = 0;
+    result["vacId"] = 0;
+    console.log(typeof result.percent);
+    console.log(result);
+    postData(result);
+    
 }
 
 /**
  * Click function for adding random vaccinations
  */
 function addRandomVaccinations(){
-    console.log('RANDOM');
+    const key = 'states';
+    console.log("hello");
+    console.log(states);
 }
 
 /**
@@ -58,3 +95,6 @@ function validateForm(){
 function clickOnState(iso){
     location.href = '/state/' + iso;
 }
+
+
+

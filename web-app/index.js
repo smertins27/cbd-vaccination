@@ -1,6 +1,6 @@
 const os = require('os')
 const dns = require('dns').promises
-const { program: optionparser } = require('commander')
+const { program: optionparser, combineFlagAndOptionalValue } = require('commander')
 const { Kafka } = require('kafkajs')
 const mysqlx = require('@mysql/xdevapi');
 const MemcachePlus = require('memcache-plus');
@@ -125,7 +125,7 @@ const producer = kafka.producer()
 // End
 
 // Send tracking message to Kafka
-async function sendTrackingMessage(data) {
+async function sendVaccinationMessage(data) {
 	//Ensure the producer is connected
 	await producer.connect()
 
@@ -144,6 +144,9 @@ async function sendTrackingMessage(data) {
 /* ########################################################################## */
 /* ############################# APP ENDPOINTS ############################## */
 /* ########################################################################## */
+
+
+
 
 // Return HTML for start page
 app.get('/', (req, res) => {
@@ -166,20 +169,51 @@ app.get('/', (req, res) => {
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
-	Promise.all([getState(isoCode)]).then(values => {
+	Promise.all([getState(isoCode), getVaccinations(), getVaccinationProgress(isoCode)]).then(values => {//
+		console.log(values);
 		const state = values[0];
-
+		const percentage = values[2];//
+		const summedUp = addPercentages(percentage);
+		console.log(summedUp);
+		/* console.log(id);
+		console.log(vaccinescode); */
 		const parameters = {
 			state,
+			percentage,
+			summedUp,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
 		}
-		console.log(state);
 		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
-
 	}).catch(e => { // Catch error to prevent server crash
 		console.error(e);
 	});
 });
+
+
+app.use(express.json())
+ app.post('/vaccinations', function(req, res){
+	const data = req.body;
+	res.send(true);
+	Promise.all([getPopulationOfState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
+		console.log('daten',values)
+		const pop = values[0].population;
+		const progressId = values[1].progressId;
+		const vacId = values[1].vacId;
+		data.progressId = parseInt(progressId);
+		data.vacId = parseInt(vacId)
+		vacAmount = parseInt(data.vac_amount);
+		data.vac_amount = vacAmount;
+		const per = vacAmount / pop;
+		const percent = per.toFixed(6);
+		data.percent = parseFloat(percent);
+		console.log(data);
+		sendVaccinationMessage(data).then(() => console.log("Sent to kafka"))
+		.catch(e => console.log("Error sending to kafka", e)) 
+	}).catch(e => { // Catch error to prevent server crash
+		console.error(e);
+	});
+		
+}) 
 
 /* -------------------------------------------------------------------------- */
 
@@ -215,6 +249,55 @@ async function getStates(){
 	}
 }
 
+//Method for getting vaccination_progress from database
+async function getVaccinationProgress(vaccination_progress) {
+	const query = "SELECT id, percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
+	let cacheData = await getFromCache(vaccination_progress);
+	
+	if(cacheData) {
+		console.log("Cache hit!");
+		cacheHit(vaccination_progress, cacheData);
+		return { ...cacheData, cached: true}
+	} else {
+		cacheMiss(vaccination_progress);
+		let data = (await executeQuery(query, [vaccination_progress])).fetchAll();
+		if (data) {
+			let result = data.map(row => ({id: row[0], percentage: row[1], statesiso: row[2], vaccinescode: row[3]}));
+			console.log(`Got result=${data}, storing in cache tom`);
+			if (memcached)
+				await memcached.set(vaccination_progress, result, cacheTimeSecs);
+			return {...result, cached: false}
+		} else {
+			throw "No data found for this state"
+		}
+	}
+}
+
+
+
+async function getPopulationOfState(state){
+	const query = 'SELECT iso, population FROM states WHERE iso = ?'
+	let cacheData = await getFromCache(state);
+
+	if(cacheData){
+		cacheHit(state, cacheData);
+		return { ...cacheData, cached: true}
+	}else{
+		cacheMiss(state);
+		let executeResult = await executeQuery(query, [state])
+		let data = executeResult.fetchOne();
+		if (data) {
+			let result = {iso: data[0], population: data[1]}
+			console.log(`Got result=${data}, storing in cache`)
+			if(memcached)
+				await memcached.set(state, result, cacheTimeSecs);
+			return { ...result, cached: false}	
+		}else {
+			throw "No Population of States found"
+		}
+	}
+}
+
 /**
  * Method for getting all available vaccines from database or memcached
  * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
@@ -238,6 +321,32 @@ async function getVaccines(){
 			return { result, cached: false }
 		} else {
 			throw "No vaccines data found"
+		}
+	}
+}
+
+async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
+	const key = state.concat(vaccinescode);
+	const progressQuery = 'SELECT id FROM vaccination_progress WHERE statesiso = ? AND vaccinescode = ?';
+	const query = 'SELECT id FROM vaccinations WHERE statesiso = ? AND vaccinescode = ?';
+	let cacheData = await getFromCache(key);
+	if(cacheData){
+		cacheHit(key, cacheData);
+		console.log("DAS WAR MEIN CHACHE HIT!")
+		return { ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let data = (await executeQuery(progressQuery, [state, vaccinescode])).fetchAll();
+		let vacData = (await executeQuery(query, [state, vaccinescode])).fetchAll();
+		if (data && vacData){
+			let result = { progressId: data[0], vacId: vacData[0] }
+			console.log(`Got result=${data, vacData}, storing in cache`);
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+
+			return { ...result, cached: false }
+		} else {
+			throw "No data found for this state"
 		}
 	}
 }
@@ -270,6 +379,30 @@ async function getState(key) {
 	}
 }
 
+async function getVaccinations() {
+	const key = 'vaccinationsFromDb';
+	const query = 'SELECT id, vaccinescode, statesiso, vac_amount FROM vaccinations';
+	let cacheData = await getFromCache(key);
+	console.log(cacheData);
+	if (cacheData){
+		cacheHit(key, cacheData);
+		return{ ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let executeResult = await executeQuery("SELECT * FROM vaccinations", [])
+		let data = executeResult.fetchAll();
+		if (data) {
+			console.log(`Got result=${data}, storing in cache`);
+			let result = data.map(row => ({id: row[0], vaccinescode: row[1], statesiso: row[2], vac_amount: row[3]}));
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);	
+			return {result, cached: false}
+		} else{
+			throw "No vaccination data found"
+		}
+	}
+}
+
 /* -------------------------------------------------------------------------- */
 
 
@@ -292,6 +425,17 @@ function cacheHit(key, data){
  */
 function cacheMiss(key) {
 	console.log(`Cache miss for key=${key}, querying database`);
+}
+
+//Function for adding up every vaccines percentage
+function addPercentages(percentage) {
+	const percentageLength = Object.keys(percentage).length-2;
+	var i = 0;
+	var summedUp = 0;
+	for(i = 0; i <= percentageLength; i++) {
+		summedUp = summedUp + percentage[i].percentage;
+	}
+	return summedUp;
 }
 
 /* -------------------------------------------------------------------------- */
