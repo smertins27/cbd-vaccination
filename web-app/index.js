@@ -174,9 +174,7 @@ app.get('/state/:iso', function(req, res){
 		const state = values[0];
 		const percentage = values[2];//
 		const summedUp = addPercentages(percentage);
-		console.log(summedUp);
-		/* console.log(id);
-		console.log(vaccinescode); */
+
 		const parameters = {
 			state,
 			percentage,
@@ -190,21 +188,31 @@ app.get('/state/:iso', function(req, res){
 });
 
 
+// Post Data to Kafka 
 app.use(express.json())
  app.post('/vaccinations', function(req, res){
 	const data = req.body;
 	res.send(true);
 	Promise.all([getPopulationOfState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
-		console.log('daten',values)
 		const pop = values[0].population;
-		const progressId = values[1].progressId;
-		const vacId = values[1].vacId;
-		data.progressId = parseInt(progressId);
-		data.vacId = parseInt(vacId)
-		vacAmount = parseInt(data.vac_amount);
-		data.vac_amount = vacAmount;
+		const vacAmount = parseInt(data.vac_amount);
 		const per = vacAmount / pop;
 		const percent = per.toFixed(6);
+		if (values[1].vacId) { 
+			const progressId = values[1].progressId;
+			const percentageInDb = values[1].dataPercentage;
+			const vacId = values[1].vacId;
+			const vacAmountInDb = values[1].dataVacAmount;
+			data.progressId = parseInt(progressId);
+			data.vacId = parseInt(vacId);
+			data.vacAmountInDb = parseFloat(vacAmountInDb);
+			data.percentageInDb = parseFloat(percentageInDb);
+		}
+		else{
+			data.vacAmountInDb = 0;
+			data.percentageInDb = 0;
+		}
+		data.vac_amount = vacAmount;
 		data.percent = parseFloat(percent);
 		console.log(data);
 		sendVaccinationMessage(data).then(() => console.log("Sent to kafka"))
@@ -299,6 +307,34 @@ async function getPopulationOfState(state){
 }
 
 /**
+ * Method for getting population of specific State
+ * @param stateiso string of the iso code
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
+async function getPopulationOfState(stateiso){
+	const query = 'SELECT iso, population FROM states WHERE iso = ?'
+	let cacheData = await getFromCache(stateiso);
+
+	if(cacheData){
+		cacheHit(stateiso, cacheData);
+		return { ...cacheData, cached: true}
+	}else{
+		cacheMiss(stateiso);
+		let executeResult = await executeQuery(query, [stateiso])
+		let data = executeResult.fetchOne();
+		if (data) {
+			let result = {iso: data[0], population: data[1]}
+			console.log(`Got result=${data}, storing in cache`)
+			if(memcached)
+				await memcached.set(stateiso, result, cacheTimeSecs);
+			return { ...result, cached: false}	
+		}else {
+			throw "No Population of States found"
+		}
+	}
+}
+
+/**
  * Method for getting all available vaccines from database or memcached
  * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
  */
@@ -352,6 +388,39 @@ async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
 }
 
 /**
+ * Method for database query checking if specific state with specific vaccine is in database
+ * @param {*} state String of the iso code
+ * @param {*} vaccinescode String of the vaccinescode
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
+
+async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
+	const key = state.concat(vaccinescode);
+	const progressQuery = 'SELECT id, percentage FROM vaccination_progress WHERE statesiso = ? AND vaccinescode = ?';
+	const query = 'SELECT id, vac_amount FROM vaccinations WHERE statesiso = ? AND vaccinescode = ?';
+	let cacheData = await getFromCache(key);
+	if(cacheData){
+		cacheHit(key, cacheData);
+		return { ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let data = (await executeQuery(progressQuery, [state, vaccinescode])).fetchOne();
+		let vacData = (await executeQuery(query, [state, vaccinescode])).fetchOne();
+		
+		if (data && vacData){
+			let result = { progressId: data[0], dataPercentage: data[1], vacId: vacData[0], dataVacAmount: vacData[1] }
+			console.log(`Got result=${data, vacData}, storing in cache`);
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+
+			return { ...result, cached: false }
+		} else {
+			return {}
+		}
+	}
+}
+
+/**
  * Method for getting a specific state from database or memcached
  * @param key String of the iso code
  * @return {Promise<{iso: *, cached: boolean, name: *, population: *}|{cached: boolean}>}
@@ -379,11 +448,16 @@ async function getState(key) {
 	}
 }
 
+
+
+/**
+ * Method for getting all vaccinations from database
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>} 
+ */
 async function getVaccinations() {
 	const key = 'vaccinationsFromDb';
 	const query = 'SELECT id, vaccinescode, statesiso, vac_amount FROM vaccinations';
 	let cacheData = await getFromCache(key);
-	console.log(cacheData);
 	if (cacheData){
 		cacheHit(key, cacheData);
 		return{ ...cacheData, cached: true };
@@ -459,28 +533,3 @@ app.listen(options.port, function () {
 
 /* -------------------------------------------------------------------------- */
 
-
-/* ########################################################################## */
-/* ############################# DEVELOP DUMP ############################### */
-/* ########################################################################## */
-
-/*app.get("/missions/:mission", (req, res) => {
-	let mission = req.params["mission"]
-
-	// Send the tracking message to Kafka
-	sendTrackingMessage({
-		mission,
-		timestamp: Math.floor(new Date() / 1000)
-	}).then(() => console.log("Sent to kafka"))
-		.catch(e => console.log("Error sending to kafka", e))
-
-	// Send reply to browser
-	getMission(mission).then(data => {
-		sendResponse(res, `<h1>${data.mission}</h1><p>${data.heading}</p>` +
-			data.description.split("\n").map(p => `<p>${p}</p>`).join("\n"),
-			data.cached
-		)
-	}).catch(err => {
-		sendResponse(res, `<h1>Error</h1><p>${err}</p>`, false)
-	})
-});*/

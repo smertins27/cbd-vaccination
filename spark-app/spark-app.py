@@ -1,7 +1,10 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
-from pyspark.sql.types import IntegerType, StringType, StructType, TimestampType, FloatType, LongType, DecimalType
+
+from pyspark.sql.types import IntegerType, StringType, StructType, FloatType, TimestampType, DecimalType, LongType, DecimalType
 import mysqlx
+from decimal import Decimal
+import math
 
 dbOptions = {"host": "my-app-mysql-service", 'port': 33060, "user": "root", "password": "mysecretpw"}
 dbSchema = 'popular'
@@ -28,38 +31,44 @@ kafkaMessages = spark \
     .load()
 
 # Define schema of tracking data
-"""  trackingMessageSchema = StructType() \
-    .add("mission", StringType()) \
-    .add("timestamp", IntegerType()) """
   
 trackingVaccinationsSchema = StructType() \
     .add("statesiso", StringType()) \
     .add("vac_amount", LongType()) \
     .add("vaccinescode", StringType()) \
     .add("timestamp", IntegerType())  \
-    .add("percent", FloatType())  \
+    .add("percent", DecimalType(20,10))  \
     .add("vacId", IntegerType())   \
-    .add("progressId", IntegerType())    
-    # .add("percentage", FloatType())    
+    .add("progressId", IntegerType()) \
+    .add("vacAmountInDb", IntegerType()) \
+    .add("percentageInDb", DecimalType(20, 10))   
+    
 # Example Part 3
 # Convert value: binary -> JSON -> fields + parsed timestamp
-""" trackingMessages = kafkaMessages.select(
-    # Extract 'value' from Kafka message (i.e., the tracking data)
+
+trackingVaccination = kafkaMessages.select(
     from_json(
         column("value").cast("string"),
-        trackingMessageSchema
+        trackingVaccinationsSchema
     ).alias("json")
 ).select(
-    # Convert Unix timestamp to TimestampType
     from_unixtime(column('json.timestamp'))
     .cast(TimestampType())
     .alias("parsed_timestamp"),
 
-    # Select all JSON fields
     column("json.*")
 ) \
-    .withColumnRenamed('json.mission', 'mission') \
-    .withWatermark("parsed_timestamp", windowDuration) """
+    .withColumnRenamed('json.statesiso', 'statesiso') \
+    .withColumnRenamed('json.vac_amount', 'vac_amount') \
+    .withColumnRenamed('json.vaccinescode', 'vaccinescode') \
+    .withColumnRenamed('json.percent', 'percent') \
+    .withColumnRenamed('json.progressId', 'progressId') \
+    .withColumnRenamed('json.vacId', 'vacId') \
+    .withColumnRenamed('json.vacAmountInDb', 'vacAmountInDb') \
+    .withColumnRenamed('json.percentageInDb', 'percentageInDb') \
+    .withWatermark("parsed_timestamp", windowDuration)
+
+    
 
 
 trackingVaccination = kafkaMessages.select(
@@ -86,14 +95,26 @@ trackingVaccination = kafkaMessages.select(
 
 # Example Part 4
 # Compute most popular slides
-""" popular = trackingMessages.groupBy(
-    window(
-        column("parsed_timestamp"),
-        windowDuration,
-        slidingDuration
-    ),
-    column("mission")
-).count().withColumnRenamed('count', 'views') """
+
+vaccinationsProgress = trackingVaccination.groupBy(
+    column("progressId").alias('id'),
+    column("statesiso"),
+    column("vaccinescode"),
+    column("percentageInDb")
+    
+    
+).agg(round(sum('percent'),6).alias('percentage'))
+
+
+
+vaccinations = trackingVaccination.groupBy(
+    column("vacId").alias('id'),
+    column("vaccinescode"),
+    column("statesiso"),
+    column("vacAmountInDb")
+).agg(sum('vac_amount').alias('vac_amount'))
+
+
 
 vaccinationsProgress = trackingVaccination.groupBy(
     window(
@@ -125,14 +146,7 @@ vaccinations = trackingVaccination.groupBy(
 
 
 # Example Part 5
-# Start running the query; print running counts to the console
-""" consoleDump = popular \
-    .writeStream \
-    .trigger(processingTime=slidingDuration) \
-    .outputMode("update") \
-    .format("console") \
-    .option("truncate", "false") \
-    .start() """
+# Start running the query
 
 consoleVaccinationsDumb = vaccinations \
     .writeStream \
@@ -141,6 +155,7 @@ consoleVaccinationsDumb = vaccinations \
     .format("console") \
     .option("truncate", "false") \
     .start()
+
 
  
 
@@ -152,8 +167,8 @@ consoleVaccinationsProgressDumb = vaccinationsProgress \
     .option("truncate", "false") \
     .start()               
 
-# Save to Vaccinations
 
+# Save to Vaccinations
 
 def saveToVaccinationsDatabase(batchDataframe, batchId):
     # Define function to save a dataframe to mysql
@@ -163,60 +178,51 @@ def saveToVaccinationsDatabase(batchDataframe, batchId):
         # Connect to database and use schema
         session = mysqlx.get_session(dbOptions)
         session.sql("USE vaccination").execute()
+        
         for row in iterator:
-            print(row)
             # Run upsert (insert or update existing)
-            if hasattr(row, 'vacId'):
-                print(row.vacId)
-                print(row.vaccinescode)
-                print(row.statesiso)
-                print(row.vac_amount)
-                print(row.vac_amount_average)
-                sql = session.sql("INSERT INTO vaccinations (id, vaccinescode, statesiso, vac_amount, vac_amount_average) VALUES ( ?, ?, ?, ?) ON DUPLICATE KEY UPDATE vac_amount = ?, vac_amount_average = ?")
-                sql.bind(row.vacId, row.vaccinescode, row.statesiso, row.vac_amount, row.vac_amount_average, row.vac_amount).execute()
+            if hasattr(row, 'vac_amount'):
+                if row.vacAmountInDb is None:
+                    vacAmount = row.vac_amount
+                else:
+                    vacAmount = row.vacAmountInDb + row.vac_amount
+                if vacAmount is not None:
+                    sql = session.sql("INSERT INTO vaccinations (id, vaccinescode, statesiso, vac_amount) VALUES ( ?, ?, ?, ?) ON DUPLICATE KEY UPDATE vac_amount = ?")
+                    sql.bind(row.id, row.vaccinescode, row.statesiso, row.vac_amount, vacAmount).execute()
             
     
-            elif hasattr(row, 'progressId'):
-                print("vaccination_progress")
-                print(row.progressId)
-                sql = session.sql("INSERT INTO vaccination_progress (id, percentage, statesiso, vaccinescode) VALUES ( ?, ?, ?) ON DUPLICATE KEY UPDATE percentage = ?")
-                sql.bind(row.progessId, row.percentage, row.statesiso, row.vaccinescode, row.percentage)
+            elif hasattr(row, 'percentage'):
+                if row.percentageInDb is None:
+                    percentage = str(Decimal(row.percentage))
+                else:
+                    percentage = str(Decimal(row.percentageInDb + row.percentage))
+                
+                if percentage is not None:
+                    sql = session.sql("INSERT INTO vaccination_progress (id, percentage, statesiso, vaccinescode) VALUES ( ?, ?, ?, ?) ON DUPLICATE KEY UPDATE percentage = ?")
+                    sql.bind(row.id, percentage, row.statesiso, row.vaccinescode, percentage).execute()
+        
+        
         session.close()
+
 
     # Perform batch UPSERTS per data partition
     batchDataframe.foreachPartition(save_to_db) 
 
- 
-    # Save to vaccination progress
-
-
-""" def saveToDatabase(batchDataframe, batchId):
-    # Define function to save a dataframe to mysql
-    def save_to_db(iterator):
-        # Connect to database and use schema
-        session = mysqlx.get_session(dbOptions)
-        session.sql("USE vaccinations").execute()
-
-        for row in iterator:
-            # Run upsert (insert or update existing)
-            sql = session.sql("INSERT INTO popular "
-                              "(mission, count) VALUES (?, ?) "
-                              "ON DUPLICATE KEY UPDATE count=?")
-            sql.bind(row.mission, row.views, row.views).execute()
-
-        session.close()
-
-    # Perform batch UPSERTS per data partition
-    batchDataframe.foreachPartition(save_to_db) """
 
 # Example Part 7
+# Start Insert Stream
 
-
-""" dbInsertStream = popular.writeStream \
+vaccinationInsertStream = vaccinations.writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
-    .foreachBatch(saveToDatabase) \
-    .start() """
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
+
+vaccinationsProgressInsertStream = vaccinationsProgress.writeStream \
+    .trigger(processingTime=slidingDuration) \
+    .outputMode("update") \
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
 
 vaccinationInsertStream = vaccinations.writeStream \
     .trigger(processingTime=slidingDuration) \
