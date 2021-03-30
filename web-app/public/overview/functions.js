@@ -41,7 +41,27 @@ function postData(data){
  */
 function saveVaccinations(){
     const form = $('#vaccinationForm');
-    console.log(form.serializeArray());
+    vaccinations = form.serializeArray();
+    var result = {};
+    var timestamp = Math.floor(new Date() / 1000)
+    for (let key in vaccinations) {
+     result[vaccinations[key].name] = vaccinations[key].value;
+    }
+    result["timestamp"] = timestamp;
+    result["percent"] = 0;
+    result["progressId"] = 0;
+    result["vacId"] = 0;
+    result["vacAmountInDb"] = 0;
+    result["percentageInDb"] = 0;
+    console.log(typeof result.percent);
+    console.log(result);
+    postData(result);
+    
+}
+
+function saveStatesAndVaccinescode(state, vaccinescode){
+    console.log(state)
+    console.log(vaccinescode)
 }
 
 /**
