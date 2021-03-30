@@ -283,29 +283,6 @@ async function getVaccinationProgress(vaccination_progress) {
 
 
 
-async function getPopulationOfState(state){
-	const query = 'SELECT iso, population FROM states WHERE iso = ?'
-	let cacheData = await getFromCache(state);
-
-	if(cacheData){
-		cacheHit(state, cacheData);
-		return { ...cacheData, cached: true}
-	}else{
-		cacheMiss(state);
-		let executeResult = await executeQuery(query, [state])
-		let data = executeResult.fetchOne();
-		if (data) {
-			let result = {iso: data[0], population: data[1]}
-			console.log(`Got result=${data}, storing in cache`)
-			if(memcached)
-				await memcached.set(state, result, cacheTimeSecs);
-			return { ...result, cached: false}	
-		}else {
-			throw "No Population of States found"
-		}
-	}
-}
-
 /**
  * Method for getting population of specific State
  * @param stateiso string of the iso code
@@ -361,31 +338,6 @@ async function getVaccines(){
 	}
 }
 
-async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
-	const key = state.concat(vaccinescode);
-	const progressQuery = 'SELECT id FROM vaccination_progress WHERE statesiso = ? AND vaccinescode = ?';
-	const query = 'SELECT id FROM vaccinations WHERE statesiso = ? AND vaccinescode = ?';
-	let cacheData = await getFromCache(key);
-	if(cacheData){
-		cacheHit(key, cacheData);
-		console.log("DAS WAR MEIN CHACHE HIT!")
-		return { ...cacheData, cached: true };
-	}else{
-		cacheMiss(key);
-		let data = (await executeQuery(progressQuery, [state, vaccinescode])).fetchAll();
-		let vacData = (await executeQuery(query, [state, vaccinescode])).fetchAll();
-		if (data && vacData){
-			let result = { progressId: data[0], vacId: vacData[0] }
-			console.log(`Got result=${data, vacData}, storing in cache`);
-			if (memcached)
-				await memcached.set(key, result, cacheTimeSecs);
-
-			return { ...result, cached: false }
-		} else {
-			throw "No data found for this state"
-		}
-	}
-}
 
 /**
  * Method for database query checking if specific state with specific vaccine is in database
