@@ -94,6 +94,17 @@ vaccinations = trackingVaccination.groupBy(
 
 # Example Part 5
 # Start running the query; print running counts to the console
+
+consoleVaccinationsDumb = vaccinations \
+    .writeStream \
+    .trigger(processingTime=slidingDuration) \
+    .outputMode("update") \
+    .format("console") \
+    .option("truncate", "false") \
+    .start()
+
+ 
+
     .writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
