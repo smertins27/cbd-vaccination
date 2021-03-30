@@ -19,6 +19,23 @@ function loadSVG() {
     });
 }
 
+
+function postData(data){
+
+    $.ajax({
+        type: 'POST',
+        url: '/vaccinations',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function (msg) {
+        
+        },
+        error: function(jqXHR, textStatus, err){
+        
+        }
+    })
+}
+
 /**
  * Submit function for adding a specific amount of vaccinations for a state
  */
