@@ -365,6 +365,34 @@ async function getState(key) {
 	}
 }
 
+
+/**
+ * Method for getting all vaccinations from database
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>} 
+ */
+async function getVaccinations() {
+	const key = 'vaccinationsFromDb';
+	const query = 'SELECT id, vaccinescode, statesiso, vac_amount FROM vaccinations';
+	let cacheData = await getFromCache(key);
+	if (cacheData){
+		cacheHit(key, cacheData);
+		return{ ...cacheData, cached: true };
+	}else{
+		cacheMiss(key);
+		let executeResult = await executeQuery("SELECT * FROM vaccinations", [])
+		let data = executeResult.fetchAll();
+		if (data) {
+			console.log(`Got result=${data}, storing in cache`);
+			let result = data.map(row => ({id: row[0], vaccinescode: row[1], statesiso: row[2], vac_amount: row[3]}));
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);	
+			return {result, cached: false}
+		} else{
+			throw "No vaccination data found"
+		}
+	}
+}
+
 /* -------------------------------------------------------------------------- */
 
 
