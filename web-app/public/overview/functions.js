@@ -73,7 +73,32 @@ function createRandomInt(max) {
  * Click function for adding random vaccinations
  */
 function addRandomVaccinations(){
-    console.log('RANDOM');
+    statesObject = JSON.parse(states);
+    vaccinesObject = JSON.parse(vaccines);
+
+    var result = {};
+    var inserts = createRandomInt(15);
+    
+    for (let i = 0; i <= inserts; i++) {
+        var timestamp = Math.floor(new Date() / 1000)
+        var countStates = createRandomInt(15);
+        var countVacs = createRandomInt(5); 
+        
+        result["statesiso"] = statesObject[countStates].iso;
+        result["vaccinescode"] = vaccinesObject[countVacs].code;
+        result["vac_amount"] = createRandomInt(20000);
+        result["timestamp"] = timestamp;
+        result["percent"] = 0;
+        result["progressId"] = 0;
+        result["vacId"] = 0;
+        result["vacAmountInDb"] = 0;
+        result["percentageInDb"] = 0;
+        console.log(result)
+        postData(result);
+    }
+    
+
+    
 }
 
 /**
