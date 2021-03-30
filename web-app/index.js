@@ -125,7 +125,7 @@ const producer = kafka.producer()
 // End
 
 // Send tracking message to Kafka
-async function sendTrackingMessage(data) {
+async function sendVaccinationMessage(data) {
 	//Ensure the producer is connected
 	await producer.connect()
 
