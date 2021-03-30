@@ -72,6 +72,26 @@ trackingVaccination = kafkaMessages.select(
 # Example Part 4
 # Compute most popular slides
 
+vaccinationsProgress = trackingVaccination.groupBy(
+    column("progressId").alias('id'),
+    column("statesiso"),
+    column("vaccinescode"),
+    column("percentageInDb")
+    
+    
+).agg(round(sum('percent'),6).alias('percentage'))
+
+
+
+vaccinations = trackingVaccination.groupBy(
+    column("vacId").alias('id'),
+    column("vaccinescode"),
+    column("statesiso"),
+    column("vacAmountInDb")
+).agg(sum('vac_amount').alias('vac_amount'))
+
+
+
 # Example Part 5
 # Start running the query; print running counts to the console
     .writeStream \
