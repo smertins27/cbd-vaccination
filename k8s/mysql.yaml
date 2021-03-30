@@ -13,12 +13,12 @@ data:
       PRIMARY KEY (`iso`),
       UNIQUE INDEX (`iso`));
 
-    DROP TABLE IF EXISTS vaccines;
-    CREATE TABLE vaccines (
-      code varchar(3) NOT NULL,
-      name varchar(255) NOT NULL,
-      PRIMARY KEY (code),
-      UNIQUE INDEX (code));
+    DROP TABLE IF EXISTS `vaccines`;
+    CREATE TABLE `vaccines` (
+      `code` varchar(3) NOT NULL,
+      `name` varchar(255) NOT NULL,
+      PRIMARY KEY (`code`),
+      UNIQUE INDEX (`code`));
 
 
     DROP TABLE IF EXISTS vaccination_progress;
