@@ -116,15 +116,44 @@ consoleVaccinationsProgressDumb = vaccinationsProgress \
 
 # Save to Vaccinations
 
+def saveToVaccinationsDatabase(batchDataframe, batchId):
     # Define function to save a dataframe to mysql
+
     def save_to_db(iterator):
+        
         # Connect to database and use schema
         session = mysqlx.get_session(dbOptions)
+        session.sql("USE vaccination").execute()
+        
         for row in iterator:
             # Run upsert (insert or update existing)
+            if hasattr(row, 'vac_amount'):
+                if row.vacAmountInDb is None:
+                    vacAmount = row.vac_amount
+                else:
+                    vacAmount = row.vacAmountInDb + row.vac_amount
+                if vacAmount is not None:
+                    sql = session.sql("INSERT INTO vaccinations (id, vaccinescode, statesiso, vac_amount) VALUES ( ?, ?, ?, ?) ON DUPLICATE KEY UPDATE vac_amount = ?")
+                    sql.bind(row.id, row.vaccinescode, row.statesiso, row.vac_amount, vacAmount).execute()
+            
+    
+            elif hasattr(row, 'percentage'):
+                if row.percentageInDb is None:
+                    percentage = str(Decimal(row.percentage))
+                else:
+                    percentage = str(Decimal(row.percentageInDb + row.percentage))
+                
+                if percentage is not None:
+                    sql = session.sql("INSERT INTO vaccination_progress (id, percentage, statesiso, vaccinescode) VALUES ( ?, ?, ?, ?) ON DUPLICATE KEY UPDATE percentage = ?")
+                    sql.bind(row.id, percentage, row.statesiso, row.vaccinescode, percentage).execute()
+        
+        
         session.close()
 
+
     # Perform batch UPSERTS per data partition
+    batchDataframe.foreachPartition(save_to_db) 
+
 
 # Example Part 7
 # Start Insert Stream
