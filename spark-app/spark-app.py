@@ -93,7 +93,7 @@ vaccinations = trackingVaccination.groupBy(
 
 
 # Example Part 5
-# Start running the query; print running counts to the console
+# Start running the query
 
 consoleVaccinationsDumb = vaccinations \
     .writeStream \
@@ -112,6 +112,7 @@ consoleVaccinationsDumb = vaccinations \
     .option("truncate", "false") \
 
 
+# Save to Vaccinations
 
     # Define function to save a dataframe to mysql
     def save_to_db(iterator):
@@ -124,6 +125,7 @@ consoleVaccinationsDumb = vaccinations \
     # Perform batch UPSERTS per data partition
 
 # Example Part 7
+# Start Insert Stream
 
 
     .trigger(processingTime=slidingDuration) \
