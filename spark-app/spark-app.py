@@ -30,6 +30,18 @@ kafkaMessages = spark \
     .load()
 
 # Define schema of tracking data
+  
+trackingVaccinationsSchema = StructType() \
+    .add("statesiso", StringType()) \
+    .add("vac_amount", LongType()) \
+    .add("vaccinescode", StringType()) \
+    .add("timestamp", IntegerType())  \
+    .add("percent", DecimalType(20,10))  \
+    .add("vacId", IntegerType())   \
+    .add("progressId", IntegerType()) \
+    .add("vacAmountInDb", IntegerType()) \
+    .add("percentageInDb", DecimalType(20, 10))   
+    
 # Example Part 3
 # Convert value: binary -> JSON -> fields + parsed timestamp
     from_json(
