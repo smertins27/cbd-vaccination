@@ -105,11 +105,13 @@ consoleVaccinationsDumb = vaccinations \
 
  
 
+consoleVaccinationsProgressDumb = vaccinationsProgress \
     .writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
     .format("console") \
     .option("truncate", "false") \
+    .start()               
 
 
 # Save to Vaccinations
