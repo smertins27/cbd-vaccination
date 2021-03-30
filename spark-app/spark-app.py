@@ -44,21 +44,30 @@ trackingVaccinationsSchema = StructType() \
     
 # Example Part 3
 # Convert value: binary -> JSON -> fields + parsed timestamp
+
+trackingVaccination = kafkaMessages.select(
     from_json(
         column("value").cast("string"),
-        trackingMessageSchema
+        trackingVaccinationsSchema
     ).alias("json")
 ).select(
-    # Convert Unix timestamp to TimestampType
     from_unixtime(column('json.timestamp'))
     .cast(TimestampType())
     .alias("parsed_timestamp"),
 
-    # Select all JSON fields
     column("json.*")
 ) \
-    .withColumnRenamed('json.mission', 'mission') \
-    .withWatermark("parsed_timestamp", windowDuration) """
+    .withColumnRenamed('json.statesiso', 'statesiso') \
+    .withColumnRenamed('json.vac_amount', 'vac_amount') \
+    .withColumnRenamed('json.vaccinescode', 'vaccinescode') \
+    .withColumnRenamed('json.percent', 'percent') \
+    .withColumnRenamed('json.progressId', 'progressId') \
+    .withColumnRenamed('json.vacId', 'vacId') \
+    .withColumnRenamed('json.vacAmountInDb', 'vacAmountInDb') \
+    .withColumnRenamed('json.percentageInDb', 'percentageInDb') \
+    .withWatermark("parsed_timestamp", windowDuration)
+
+    
 
 # Example Part 4
 # Compute most popular slides
