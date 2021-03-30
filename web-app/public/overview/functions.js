@@ -64,6 +64,11 @@ function saveStatesAndVaccinescode(state, vaccinescode){
     console.log(vaccinescode)
 }
 
+function createRandomInt(max) {
+    return Math.floor(Math.random()*Math.floor(max));
+}
+
+
 /**
  * Click function for adding random vaccinations
  */
