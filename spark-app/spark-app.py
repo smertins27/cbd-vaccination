@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
+
 from pyspark.sql.types import IntegerType, StringType, StructType, FloatType, TimestampType, DecimalType, LongType, DecimalType
 import mysqlx
 from decimal import Decimal
@@ -69,6 +70,29 @@ trackingVaccination = kafkaMessages.select(
 
     
 
+
+trackingVaccination = kafkaMessages.select(
+    from_json(
+        column("value").cast("string"),
+        trackingVaccinationsSchema
+    ).alias("json")
+).select(
+    from_unixtime(column('json.timestamp'))
+    .cast(TimestampType())
+    .alias("parsed_timestamp"),
+
+    column("json.*")
+) \
+    .withColumnRenamed('json.statesiso', 'statesiso') \
+    .withColumnRenamed('json.vac_amount', 'vac_amount') \
+    .withColumnRenamed('json.vaccinescode', 'vaccinescode') \
+    .withColumnRenamed('json.percent', 'percent') \
+    .withColumnRenamed('json.progressId', 'progressId') \
+    .withColumnRenamed('json.vacId', 'vacId') \
+    .withWatermark("parsed_timestamp", windowDuration)
+
+    
+
 # Example Part 4
 # Compute most popular slides
 
@@ -92,6 +116,35 @@ vaccinations = trackingVaccination.groupBy(
 
 
 
+vaccinationsProgress = trackingVaccination.groupBy(
+    window(
+        column("parsed_timestamp"),
+        windowDuration,
+        slidingDuration
+    ),
+    column("progressId"),
+    column("statesiso"),
+    column("vaccinescode")
+    
+    
+).agg(sum('percent').alias('percentage'))
+
+
+print(vaccinationsProgress)
+
+vaccinations = trackingVaccination.groupBy(
+    window(
+        column("parsed_timestamp"),
+        windowDuration,
+        slidingDuration
+    ),
+    column("vacId"),
+    column("vaccinescode"),
+    column("statesiso")
+).agg(sum('vac_amount').alias('vac_amount'), avg('vac_amount').alias('vac_amount_average'))
+
+
+
 # Example Part 5
 # Start running the query
 
@@ -102,6 +155,7 @@ consoleVaccinationsDumb = vaccinations \
     .format("console") \
     .option("truncate", "false") \
     .start()
+
 
  
 
@@ -157,6 +211,18 @@ def saveToVaccinationsDatabase(batchDataframe, batchId):
 
 # Example Part 7
 # Start Insert Stream
+
+vaccinationInsertStream = vaccinations.writeStream \
+    .trigger(processingTime=slidingDuration) \
+    .outputMode("update") \
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
+
+vaccinationsProgressInsertStream = vaccinationsProgress.writeStream \
+    .trigger(processingTime=slidingDuration) \
+    .outputMode("update") \
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
 
 vaccinationInsertStream = vaccinations.writeStream \
     .trigger(processingTime=slidingDuration) \

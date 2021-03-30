@@ -31,7 +31,7 @@
                             <label>
                                 Federal State
                                 <%=  %>
-                                <select name="statesiso">
+                                <select id="states" name="statesiso">
                                     <% states.forEach(function(state) { %>
                                     <option value="<%= state.iso %>"><%= state.name %></option>
                                     <% })%>
@@ -95,6 +95,10 @@
         </div>
     </div>
 </footer>
-
+<script>
+    
+    console.log("hello");
+    console.log(states);
+</script>
 </body>
 </html>

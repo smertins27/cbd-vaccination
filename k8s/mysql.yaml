@@ -43,6 +43,7 @@ data:
 
 
 
+
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BB', 'Brandenburg', 2522000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BE', 'Berlin', 3669000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BW', 'Baden-Wuettenberg', 11100000);
@@ -66,6 +67,7 @@ data:
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('gsk', 'Sanofi/GSK');
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('jaj', 'Johnson & Johnson');
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('mdn', 'Moderna');
+
 
 ---
 apiVersion: apps/v1

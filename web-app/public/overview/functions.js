@@ -1,6 +1,8 @@
 // Event which is triggered when document is ready
 $('document').ready(() => {
     loadSVG();
+    const states = document.getElementById("states");
+    console.log(states.name);
 })
 
 /**
@@ -95,10 +97,7 @@ function addRandomVaccinations(){
         result["percentageInDb"] = 0;
         console.log(result)
         postData(result);
-    }
-    
-
-    
+    } 
 }
 
 /**
@@ -125,3 +124,6 @@ function validateForm(){
 function clickOnState(iso){
     location.href = '/state/' + iso;
 }
+
+
+
