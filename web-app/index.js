@@ -166,14 +166,12 @@ app.get('/', (req, res) => {
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
-	Promise.all([getState(isoCode)]).then(values => {
+	Promise.all([getState(isoCode), getVaccinations()]).then(values => {
 		const state = values[0];
-
 		const parameters = {
 			state,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
 		}
-		console.log(state);
 		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
 
 	}).catch(e => { // Catch error to prevent server crash
