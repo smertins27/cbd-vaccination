@@ -31,14 +31,14 @@ data:
       UNIQUE INDEX (`id`));
 
 
-    DROP TABLE IF EXISTS vaccinations;
-    CREATE TABLE vaccinations (
-      id           bigint(20) NOT NULL AUTO_INCREMENT,
-      vaccinescode varchar(3) NOT NULL,
-      statesiso    varchar(2) NOT NULL,
-      vac_amount   int(10) NOT NULL,
-      PRIMARY KEY (id),
-      UNIQUE INDEX (id));
+    DROP TABLE IF EXISTS `vaccinations`;
+    CREATE TABLE `vaccinations` (
+      `id`           bigint(20) NOT NULL AUTO_INCREMENT,
+      `vaccinescode` varchar(3) NOT NULL,
+      `statesiso`    varchar(2) NOT NULL,
+      `vac_amount`   int(10) NOT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE INDEX (`id`));
 
 
 
