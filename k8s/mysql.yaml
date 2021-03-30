@@ -24,7 +24,7 @@ data:
     DROP TABLE IF EXISTS vaccination_progress;
     CREATE TABLE vaccination_progress (
       id           bigint(20) NOT NULL AUTO_INCREMENT,
-      percentage   float NOT NULL,
+      percentage   double precision(20, 7) NOT NULL,
       statesiso    varchar(2) NOT NULL,
       vaccinescode varchar(3) NOT NULL,
       PRIMARY KEY (id),
@@ -37,6 +37,7 @@ data:
       vaccinescode varchar(3) NOT NULL,
       statesiso    varchar(2) NOT NULL,
       vac_amount   int(10) NOT NULL,
+      vac_amount_average double precision(20,7) NOT NULL,
       PRIMARY KEY (id),
       UNIQUE INDEX (id));
 
@@ -66,6 +67,214 @@ data:
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('gsk', 'Sanofi/GSK');
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('jaj', 'Johnson & Johnson');
     INSERT INTO `vaccines` (`code`, `name`) VALUES ('mdn', 'Moderna');
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (1, 'azc', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (2, 'azc', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (3, 'azc', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (4, 'azc', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (5, 'azc', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (6, 'azc', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (7, 'azc', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (8, 'azc', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (9, 'azc', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (10, 'azc', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (11, 'azc', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (12, 'azc', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (13, 'azc', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (14, 'azc', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (15, 'azc', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (16, 'azc', 'TH', 340, 340);
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (17, 'bnt', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (18, 'bnt', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (19, 'bnt', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (20, 'bnt', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (21, 'bnt', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (22, 'bnt', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (23, 'bnt', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (24, 'bnt', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (25, 'bnt', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (26, 'bnt', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (27, 'bnt', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (28, 'bnt', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (29, 'bnt', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (30, 'bnt', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (31, 'bnt', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (32, 'bnt', 'TH', 340, 340);
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (33, 'cuv', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (34, 'cuv', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (35, 'cuv', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (36, 'cuv', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (37, 'cuv', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (38, 'cuv', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (39, 'cuv', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (40, 'cuv', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (41, 'cuv', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (42, 'cuv', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (43, 'cuv', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (44, 'cuv', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (45, 'cuv', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (46, 'cuv', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (47, 'cuv', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (48, 'cuv', 'TH', 340, 340);
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (49, 'gsk', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (50, 'gsk', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (51, 'gsk', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (52, 'gsk', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (53, 'gsk', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (54, 'gsk', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (55, 'gsk', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (56, 'gsk', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (57, 'gsk', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (58, 'gsk', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (59, 'gsk', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (60, 'gsk', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (61, 'gsk', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (62, 'gsk', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (63, 'gsk', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (64, 'gsk', 'TH', 340, 340);
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (65, 'jaj', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (66, 'jaj', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (67, 'jaj', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (68, 'jaj', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (69, 'jaj', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (70, 'jaj', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (71, 'jaj', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (72, 'jaj', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (73, 'jaj', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (74, 'jaj', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (75, 'jaj', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (76, 'jaj', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (77, 'jaj', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (78, 'jaj', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (79, 'jaj', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (80, 'jaj', 'TH', 340, 340);
+
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (81, 'mdn', 'NI', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (82, 'mdn', 'BB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (83, 'mdn', 'BE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (84, 'mdn', 'BW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (85, 'mdn', 'BY', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (86, 'mdn', 'HB', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (87, 'mdn', 'HE', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (88, 'mdn', 'HH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (89, 'mdn', 'MV', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (90, 'mdn', 'NW', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (91, 'mdn', 'RP', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (92, 'mdn', 'SH', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (93, 'mdn', 'SL', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (94, 'mdn', 'SN', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (95, 'mdn', 'ST', 340, 340);
+    INSERT INTO `vaccinations` (`id`, `vaccinescode`, `statesiso`, `vac_amount`, `vac_amount_average`) VALUES (96, 'mdn', 'TH', 340, 340);
+
+    
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (1, 0.000042, 'NI', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (2, 0.000042, 'BB', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (3, 0.000042, 'BE', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (4, 0.000042, 'BW', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (5, 0.000042, 'BY', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (6, 0.000042, 'HB', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (7, 0.000042, 'HE', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (8, 0.000042, 'HH', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (9, 0.000042, 'MV', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (10, 0.000042, 'NW', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (11, 0.000042, 'RP', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (12, 0.000042, 'SH', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (13, 0.000042, 'SL', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (14, 0.000042, 'SN', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (15, 0.000042, 'ST', 'azc');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (16, 0.000042, 'TH', 'azc');
+
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (17, 0.000042, 'NI', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (18, 0.000042, 'BB', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (19, 0.000042, 'BE', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (20, 0.000042, 'BW', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (21, 0.000042, 'BY', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (22, 0.000042, 'HB', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (23, 0.000042, 'HE', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (24, 0.000042, 'HH', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (25, 0.000042, 'MV', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (26, 0.000042, 'NW', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (27, 0.000042, 'RP', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (28, 0.000042, 'SH', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (29, 0.000042, 'SL', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (30, 0.000042, 'SN', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (31, 0.000042, 'ST', 'bnt');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (32, 0.000042, 'TH', 'bnt');
+
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (33, 0.000042, 'NI', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (34, 0.000042, 'BB', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (35, 0.000042, 'BE', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (36, 0.000042, 'BW', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (37, 0.000042, 'BY', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (38, 0.000042, 'HB', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (39, 0.000042, 'HE', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (40, 0.000042, 'HH', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (41, 0.000042, 'MV', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (42, 0.000042, 'NW', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (43, 0.000042, 'RP', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (44, 0.000042, 'SH', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (45, 0.000042, 'SL', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (46, 0.000042, 'SN', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (47, 0.000042, 'ST', 'cuv');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (48, 0.000042, 'TH', 'cuv');
+
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (49, 0.000042, 'NI', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (50, 0.000042, 'BB', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (51, 0.000042, 'BE', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (52, 0.000042, 'BW', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (53, 0.000042, 'BY', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (54, 0.000042, 'HB', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (55, 0.000042, 'HE', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (56, 0.000042, 'HH', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (57, 0.000042, 'MV', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (58, 0.000042, 'NW', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (59, 0.000042, 'RP', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (60, 0.000042, 'SH', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (61, 0.000042, 'SL', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (62, 0.000042, 'SN', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (63, 0.000042, 'ST', 'gsk');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (64, 0.000042, 'TH', 'gsk');
+
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (65, 0.000042, 'NI', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (66, 0.000042, 'BB', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (67, 0.000042, 'BE', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (68, 0.000042, 'BW', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (69, 0.000042, 'BY', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (70, 0.000042, 'HB', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (71, 0.000042, 'HE', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (72, 0.000042, 'HH', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (73, 0.000042, 'MV', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (74, 0.000042, 'NW', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (75, 0.000042, 'RP', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (76, 0.000042, 'SH', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (77, 0.000042, 'SL', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (78, 0.000042, 'SN', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (79, 0.000042, 'ST', 'jaj');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (80, 0.000042, 'TH', 'jaj');
+
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (81, 0.000042, 'NI', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (82, 0.000042, 'BB', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (83, 0.000042, 'BE', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (84, 0.000042, 'BW', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (85, 0.000042, 'BY', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (86, 0.000042, 'HB', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (87, 0.000042, 'HE', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (88, 0.000042, 'HH', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (89, 0.000042, 'MV', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (90, 0.000042, 'NW', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (91, 0.000042, 'RP', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (92, 0.000042, 'SH', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (93, 0.000042, 'SL', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (94, 0.000042, 'SN', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (95, 0.000042, 'ST', 'mdn');
+    INSERT INTO `vaccination_progress` (`id`, `percentage`, `statesiso`, `vaccinescode`) VALUES (96, 0.000042, 'TH', 'mdn');
+
+    
+
 
 ---
 apiVersion: apps/v1

@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <!-- External file for js functions -->
     <script type="application/javascript" src="../public/state/functions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="../../index.js"></script>
+    <style type="text/css">
+        .chart{
+          margin-top: 20;
+        }
+    </style>
 
 </head>
 <body>
@@ -19,9 +26,37 @@
         <div class="content">
             <h1>Vaccination progess of <%= state.name %></h1>
             <div class="map" style="background-image: url(../public/state/images/<%= state.iso %>.svg)"></div>
+            <div class="chart">
+              <canvas id="vacChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
+
+
+
+<script> 
+    let vacChartObject = document.getElementById('vacChart').getContext('2d');
+    let labels = ['Vaccinated', 'Not vaccinated'];
+    var percentage = parseFloat("<%= summedUp%>");
+
+    let chart = new Chart(vacChartObject, {
+      type: 'pie',
+      data: {
+        datasets: [{
+          data: [percentage, 100],
+          backgroundColor: [
+            '#50B432',
+            '#ED561B'
+          ]
+        }],
+        labels: labels
+      },
+      options: {
+        responsive: true
+      }     
+    });
+</script>
 
 <footer>
     <div class="wrapper">
