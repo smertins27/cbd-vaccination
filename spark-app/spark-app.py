@@ -164,8 +164,11 @@ vaccinationInsertStream = vaccinations.writeStream \
     .foreachBatch(saveToVaccinationsDatabase) \
     .start() 
 
+vaccinationsProgressInsertStream = vaccinationsProgress.writeStream \
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
 
 # Wait for termination
 spark.streams.awaitAnyTermination()
