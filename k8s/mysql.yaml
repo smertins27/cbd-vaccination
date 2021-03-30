@@ -5,13 +5,13 @@ metadata:
   name: mysql-deployment-init-configmap
 data:
   mysql-init.sql: |
-    DROP TABLE IF EXISTS states;
-    CREATE TABLE states (
-      iso        varchar(2) NOT NULL,
-      name       varchar(255) NOT NULL,
-      population bigint(20) NOT NULL,
-      PRIMARY KEY (iso),
-      UNIQUE INDEX (iso));
+    DROP TABLE IF EXISTS `states`;
+    CREATE TABLE `states` (
+      `iso`        varchar(2) NOT NULL,
+      `name`      varchar(255) NOT NULL,
+      `population` bigint(20) NOT NULL,
+      PRIMARY KEY (`iso`),
+      UNIQUE INDEX (`iso`));
 
     DROP TABLE IF EXISTS vaccines;
     CREATE TABLE vaccines (
