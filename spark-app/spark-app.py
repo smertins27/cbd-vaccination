@@ -158,6 +158,11 @@ def saveToVaccinationsDatabase(batchDataframe, batchId):
 # Example Part 7
 # Start Insert Stream
 
+vaccinationInsertStream = vaccinations.writeStream \
+    .trigger(processingTime=slidingDuration) \
+    .outputMode("update") \
+    .foreachBatch(saveToVaccinationsDatabase) \
+    .start() 
 
     .trigger(processingTime=slidingDuration) \
     .outputMode("update") \
