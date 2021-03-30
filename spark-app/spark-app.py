@@ -8,7 +8,7 @@ import math
 dbOptions = {"host": "my-app-mysql-service", 'port': 33060, "user": "root", "password": "mysecretpw"}
 dbSchema = 'popular'
 windowDuration = '5 minutes'
-slidingDuration = '1 minute'
+slidingDuration = '3 minutes'
 
 # Example Part 1
 # Create a spark session
