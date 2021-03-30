@@ -38,13 +38,14 @@
 <script> 
     let vacChartObject = document.getElementById('vacChart').getContext('2d');
     let labels = ['Vaccinated', 'Not vaccinated'];
-    var percentage = parseFloat("<%= summedUp%>");
+    let vacPercentage = parseFloat("<%= summedUp%>") * 100;
+    let notVacPercentage = 100 - vacPercentage;
 
     let chart = new Chart(vacChartObject, {
       type: 'pie',
       data: {
         datasets: [{
-          data: [percentage, 100],
+          data: [vacPercentage, notVacPercentage],
           backgroundColor: [
             '#50B432',
             '#ED561B'
