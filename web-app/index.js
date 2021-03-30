@@ -250,6 +250,34 @@ async function getStates(){
 }
 
 /**
+ * Method for getting population of specific State
+ * @param stateiso string of the iso code
+ * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
+ */
+async function getPopulationOfState(stateiso){
+	const query = 'SELECT iso, population FROM states WHERE iso = ?'
+	let cacheData = await getFromCache(stateiso);
+
+	if(cacheData){
+		cacheHit(stateiso, cacheData);
+		return { ...cacheData, cached: true}
+	}else{
+		cacheMiss(stateiso);
+		let executeResult = await executeQuery(query, [stateiso])
+		let data = executeResult.fetchOne();
+		if (data) {
+			let result = {iso: data[0], population: data[1]}
+			console.log(`Got result=${data}, storing in cache`)
+			if(memcached)
+				await memcached.set(stateiso, result, cacheTimeSecs);
+			return { ...result, cached: false}	
+		}else {
+			throw "No Population of States found"
+		}
+	}
+}
+
+/**
  * Method for getting all available vaccines from database or memcached
  * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
  */
