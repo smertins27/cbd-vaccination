@@ -8,7 +8,7 @@ This use case is implemented by **Sebastian Mertins**, **Pascal Seegers** and **
 
 For a quick overview you are able to find a screencast of our application in *documentation*.
 
-##Idea: Dashboard for all German federal states and their vaccination progress
+## Idea: Dashboard for all German federal states and their vaccination progress
 First we thought about a dashboard for the world vaccination progress, which presents the progress of all countries in the world.
 In that use case we weren't able to achieve the Big Data character due the missing insert and update of data. So we decided to create a fictional dashboard for Germany and its federal states only.
 To work with data and process them, we've planned a fictional use case for this dashboard. A user is able to add new vaccinations which are added to the vaccination progress of a federal state.
