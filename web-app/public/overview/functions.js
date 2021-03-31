@@ -1,8 +1,6 @@
 // Event which is triggered when document is ready
 $('document').ready(() => {
     loadSVG();
-    const states = document.getElementById("states");
-    console.log(states.name);
 })
 
 /**
@@ -21,8 +19,11 @@ function loadSVG() {
     });
 }
 
-
-function postData(data){
+/**
+ * Perform send of data to backend
+ * @param data Array which contains all needed data
+ */
+function addVaccinations(data){
 
     $.ajax({
         type: 'POST',
@@ -43,61 +44,65 @@ function postData(data){
  */
 function saveVaccinations(){
     const form = $('#vaccinationForm');
-    vaccinations = form.serializeArray();
-    var result = {};
-    var timestamp = Math.floor(new Date() / 1000)
+    let vaccinations = form.serializeArray();
+
+    let timestamp = Math.floor(new Date() / 1000);
+    let result = preparePostData(timestamp);
     for (let key in vaccinations) {
-     result[vaccinations[key].name] = vaccinations[key].value;
+        if (vaccinations.hasOwnProperty(key)){
+            result[vaccinations[key].name] = vaccinations[key].value;
+        }
     }
-    result["timestamp"] = timestamp;
-    result["percent"] = 0;
-    result["progressId"] = 0;
-    result["vacId"] = 0;
-    result["vacAmountInDb"] = 0;
-    result["percentageInDb"] = 0;
-    console.log(typeof result.percent);
-    console.log(result);
-    postData(result);
-    
-}
 
-function saveStatesAndVaccinescode(state, vaccinescode){
-    console.log(state)
-    console.log(vaccinescode)
-}
+    addVaccinations(result);
 
-function createRandomInt(max) {
-    return Math.floor(Math.random()*Math.floor(max));
-}
+    form[0].reset();
+    validateForm();
 
+}
 
 /**
  * Click function for adding random vaccinations
  */
 function addRandomVaccinations(){
-    statesObject = JSON.parse(states);
-    vaccinesObject = JSON.parse(vaccines);
+    const statesObject = JSON.parse(states);
+    const vaccinesObject = JSON.parse(vaccines);
 
-    var result = {};
-    var inserts = createRandomInt(15);
+    let inserts = createRandomInt(15);
     
     for (let i = 0; i <= inserts; i++) {
-        var timestamp = Math.floor(new Date() / 1000)
-        var countStates = createRandomInt(15);
-        var countVacs = createRandomInt(5); 
+        let timestamp = Math.floor(new Date() / 1000)
+        let countStates = createRandomInt(15);
+        let countVacs = createRandomInt(5);
+
+        let result = preparePostData(timestamp);
         
         result["statesiso"] = statesObject[countStates].iso;
         result["vaccinescode"] = vaccinesObject[countVacs].code;
         result["vac_amount"] = createRandomInt(20000);
-        result["timestamp"] = timestamp;
-        result["percent"] = 0;
-        result["progressId"] = 0;
-        result["vacId"] = 0;
-        result["vacAmountInDb"] = 0;
-        result["percentageInDb"] = 0;
-        console.log(result)
-        postData(result);
+        addVaccinations(result);
     } 
+}
+
+function preparePostData(timestamp){
+    let data = {};
+    data["timestamp"] = timestamp;
+    data["percent"] = 0;
+    data["progressId"] = 0;
+    data["vacId"] = 0;
+    data["vacAmountInDb"] = 0;
+    data["percentageInDb"] = 0;
+
+    return data;
+}
+
+/**
+ * Method for generation a random integer with upper limit
+ * @param max Number of upper limit
+ * @return {number}
+ */
+function createRandomInt(max) {
+    return Math.floor(Math.random()*Math.floor(max));
 }
 
 /**
@@ -121,6 +126,10 @@ function validateForm(){
     }
 }
 
+/**
+ * Method triggered by clicking on a state of the svg
+ * @param iso
+ */
 function clickOnState(iso){
     location.href = '/state/' + iso;
 }

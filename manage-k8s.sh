@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Launch minikube from a mac system and start setup of minikube
-function kubernetesMac(){
+function k8sMac(){
   unset KUBECONFIG
   minikube start --memory 8192 --cpus 4 --vm-driver=hyperkit
   setup
 }
 
 # Launch minikube from a linux system and start setup of minikube
-function kubernetesLinux(){
+function k8sLinux(){
   unset KUBECONFIG
   minikube start --memory 6144 --cpus 4
   setup
@@ -36,12 +36,6 @@ function clear() {
   helm uninstall my-kafka-operator
   kubectl delete -f kafka-cluster.yaml
   helm delete my-hadoop-cluster
-}
-
-# Reset minikube: Call clear and start function
-function reset(){
-  clear
-  start
 }
 
 # Stop local minikube kubernetes deployment
