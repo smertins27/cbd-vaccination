@@ -256,30 +256,27 @@ async function getStates(){
 	}
 }
 
-/**
- * Method for getting population of specific State
- * @param stateiso string of the iso code
- * @return {Promise<{result: *, cached: boolean}|{result: *, cached: boolean}>}
- */
-async function getPopulationOfState(stateiso){
-	const query = 'SELECT iso, population FROM states WHERE iso = ?'
-	let cacheData = await getFromCache(stateiso);
+// Method for getting vaccination_progress from database
+async function getVaccinationProgress(statesiso) {
+	let key = 'vacProgress_' + statesiso;
+	const query = "SELECT id, percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
+	let cacheData = await getFromCache(key);
 
-	if(cacheData){
-		cacheHit(stateiso, cacheData);
+	if(cacheData) {
+		console.log("Cache hit!");
+		cacheHit(key, cacheData);
 		return { ...cacheData, cached: true}
-	}else{
-		cacheMiss(stateiso);
-		let executeResult = await executeQuery(query, [stateiso])
-		let data = executeResult.fetchOne();
+	} else {
+		cacheMiss(key);
+		let data = (await executeQuery(query, [key])).fetchAll();
 		if (data) {
-			let result = {iso: data[0], population: data[1]}
-			console.log(`Got result=${data}, storing in cache`)
-			if(memcached)
-				await memcached.set(stateiso, result, cacheTimeSecs);
-			return { ...result, cached: false}	
-		}else {
-			throw "No Population of States found"
+			let result = data.map(row => ({id: row[0], percentage: row[1], statesiso: row[2], vaccinescode: row[3]}));
+			console.log(`Got result=${data}, storing in cache tom`);
+			if (memcached)
+				await memcached.set(key, result, cacheTimeSecs);
+			return {...result, cached: false}
+		} else {
+			throw "No data found for this state"
 		}
 	}
 }
