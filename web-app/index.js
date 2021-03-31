@@ -172,8 +172,8 @@ app.get('/state/:iso', function(req, res){
 	Promise.all([getState(isoCode), getVaccinations(), getVaccinationProgress(isoCode)]).then(values => {
 		const state = values[0];
 		const percentage = values[2];
-		const summedUp = addPercentages(percentage);
-
+		// const summedUp = addPercentages(percentage);
+		const summedUp = 0;
 		const parameters = {
 			state,
 			percentage,
@@ -192,7 +192,7 @@ app.use(express.json())
  app.post('/vaccinations', function(req, res){
 	const data = req.body;
 	res.send(true);
-	Promise.all([getPopulationOfState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
+	Promise.all([getState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
 		const pop = values[0].population;
 		const vacAmount = parseInt(data.vac_amount);
 		const per = vacAmount / pop;
@@ -255,32 +255,6 @@ async function getStates(){
 		}
 	}
 }
-
-// Method for getting vaccination_progress from database
-async function getVaccinationProgress(vaccination_progress) {
-	const query = "SELECT id, percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
-	let cacheData = await getFromCache(vaccination_progress);
-	
-	if(cacheData) {
-		console.log("Cache hit!");
-		cacheHit(vaccination_progress, cacheData);
-		return { ...cacheData, cached: true}
-	} else {
-		cacheMiss(vaccination_progress);
-		let data = (await executeQuery(query, [vaccination_progress])).fetchAll();
-		if (data) {
-			let result = data.map(row => ({id: row[0], percentage: row[1], statesiso: row[2], vaccinescode: row[3]}));
-			console.log(`Got result=${data}, storing in cache tom`);
-			if (memcached)
-				await memcached.set(vaccination_progress, result, cacheTimeSecs);
-			return {...result, cached: false}
-		} else {
-			throw "No data found for this state"
-		}
-	}
-}
-
-
 
 /**
  * Method for getting population of specific State
