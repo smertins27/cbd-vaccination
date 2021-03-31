@@ -66,7 +66,22 @@ To simulate the Big Data character and to stress the batch processing a huge amo
 }
 ```
 
-***WAITING FOR PASCALS DATA***
+Via the function *add random vaccinations* the Client produces up to 15 inserts at the same time. The application will then select all data from the tables vaccinations and vaccination_progress where the statesiso and vaccinescode is the same as the generated data.
+If there's no data available for this specific state with this specific vaccine the fields *vacId*, *progressId*, *vacAmountInDb* and *percentageInDb* won't be changed and remain 0. 
+Else these fields will be updated and inserted in the object seen above. 
+
+This object will be sent to kafka and spark fetches the data from kafka. Spark needs a defined schema to resolve the data which is used to convert the from kafka received data. The input data is binary and gets converted into JSON and then into fields.
+
+### Data calculation
+
+After that the fields get grouped into *vaccinations* and *vaccinationProgress*. For the vaccination progress the percentage with all same states and same vaccines get summed up into one entry. For the vaccinations the vac_amount with same states and same vaccines also get summed up into one entry.
+
+The query for the console dump starts after the sliding duration is over. The exact same happens for every batch and the insert stream for writing into database gets started. Dataframes then get inserted into database by the function *saveToVaccinationsDatabase* which will accept a batchframe and batchid. MySQL uses the database schema vaccination and spark SQL runs an upsert for every partition in the batchframe. If the partition has got the attribute *vac_amount* the function knows that this needs to be inserted into the table vaccinations. If it has the attribute percentage it knows that this has to be written into vaccination_progress.
+
+Here the function needs the provided field *vacAmountInDb* or *percentageInDb*. The new percentage will be calculated by adding the *percentageInDb* from the database to the generated percentage *percent*. This will also be done for the vaccinations with the *vac_amount*. 
+
+To run an upsert the function needs the key to check for duplicate keys. These keys are the *vacId* for the vaccinations and the *progressId* for the vaccination_progress. When there's no data available for the id's new data will be inserted and a new id will be given. 
+
 
 ## Templating and external libraries
 ### EJS
