@@ -169,15 +169,18 @@ app.get('/', (req, res) => {
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
-	Promise.all([getState(isoCode), getVaccinationProgress(isoCode)]).then(values => {
+	Promise.all([getState(isoCode), getVaccinationProgress(isoCode), getVaccines()]).then(values => {
 		const state = values[0];
 		const progress = values[1];
-		console.log(progress);
+		const vaccines = values[2];
+
 		const parameters = {
 			state: state.result,
 			progress: progress.result,
+			vaccines: vaccines.result,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
 		}
+
 		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
 	}).catch(e => { // Catch error to prevent server crash
 		console.error(e);

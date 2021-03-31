@@ -11,11 +11,11 @@
     <!-- External file for js functions -->
     <script type="application/javascript">
         // Parsing the parameter data for usage with js
-        const progress = '<%- JSON.stringify(progress) %>';
-        const vaccinationProgress = JSON.parse(progress);
+        const vaccinationProgress = JSON.parse('<%- JSON.stringify(progress) %>');
+        const vaccines = JSON.parse('<%- JSON.stringify(vaccines) %>');
     </script>
     <script type="application/javascript" src="../public/state/functions.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 
 </head>
 <body>
@@ -26,7 +26,10 @@
             <h1>Vaccination progess of <%= state.name %></h1>
             <div class="map" style="background-image: url(../public/state/images/<%= state.iso %>.svg)"></div>
             <div class="chart">
-              <canvas id="vacChart"></canvas>
+                <h2>Percent distribution of progress</h2>
+                <canvas id="progressChart"></canvas>
+                <h2>Distribution of vaccines </h2>
+                <canvas id="distributionChart"></canvas>
             </div>
         </div>
     </div>
