@@ -21,36 +21,36 @@ For the Big Data Science application we are using a Kubernetes Cluster which is 
 This allows us to run a scalable development structure and react to higher traffic/load by starting new instances of the web and cache server and the big data services.
 
 The mentioned load balancer is provided by Kubernetes with an ingress and distributes the traffic to multiple webservers. In our case we are only using one webserver to keep the use case as simple as possible.
-For serving the webserver application to a user, we are using NodeJS with Express for serving the content.
+For making the webserver application accessible to users, we are using NodeJS with Express for displaying the content.
 
-As shown as in the architecture picture, the web server grants its data from a cache or MySQL server. The usage of multiple cache servers, implemented by a memcached-cluster, reduce the stress of the database and allows a higher scalability of the application.
-The web server doesn't insert data directly into the database. For that case there is a Kafka cluster running, which ist working as a big data message service.
+As shown in the architecture picture, the web server grants its data from a cache or MySQL server. The usage of multiple cache servers, implemented by a memcached-cluster, relieves the database and allows a higher scalability of the application.
+The web server doesn't insert data directly into the database. For that case there is a Kafka cluster running, which is working as a big data message service.
 That cluster docks on the Spark application, which is also running inside the same cluster. That Spark Application, computes the message data from Kafka and sends it directly into the database or the checkpoints will be stored into the Data Lake.
 The Data Lake is provided by a HDFS cluster.
 
 ### Database Design
 ![Database Design](https://raw.githubusercontent.com/smertins27/cbd-vaccination/master/documentation/images/MySQL_Database.png)
 
-The following images gives a slight overview about our database structure.
-Mainly we are using four tables, which holds the complete data of the project.
+The following image gives a slight overview about our database structure.
+Mainly we are using four tables, which hold the complete data of the project.
 The tables **states** and **vaccines** are preloaded with content to ensure that the application runs properly.
-The remaining tables are feed with dynamic user generated or batch calculated data, which are inserted via kafka and batch processing.
+The remaining tables are fed with dynamic user generated or batch calculated data, which is inserted via kafka and batch processing.
 
 ## Workflow and file structure
 ![Workflow](https://raw.githubusercontent.com/smertins27/cbd-vaccination/master/documentation/images/Workflow.png)
 
 In this use case there are no automatically generated points to start the workflow process. First the *web-app/index.js* provides the HTML, CSS and JavaScript files to a user.
-With usage of the Express package there several routes for the application defined. If a user submits the form from the index page the data for processing is generated and send via a POST-Request to */vaccinations*.
-This route is defined in the earlier mentioned *index.js*. This triggers the Kafka producer and send the vaccinationTrackingMessage to the Spark application *spark-app/spark-app.py*. Spark starts the batch processing and computes the needed data.
-After that the processed data is going to be stored in the database and that checkpoints will be written into HDFS.
+With usage of the Express package there are several routes for the application defined. If a user submits the form from the index page the data for processing is generated and sent via POST-Request to */vaccinations*.
+This route is defined in the earlier mentioned *index.js*. This triggers the Kafka producer and sends the vaccinationTrackingMessage to the Spark application *spark-app/spark-app.py*. Spark starts the batch processing and computes the needed data.
+After that the processed data is going to be stored in the database and some checkpoints will be written into HDFS.
 
-If the user navigates to a state page the *index.js* receives the called route and will collect all needed data. In this case the state, vaccine and vaccination progress is fetched. First the cache is checked if the data is already present, if not a database query is performed.
-After that the data is parsed to the template to render the page properly.
+If the user navigates to a state page the *index.js* receives the called route and will collect all data needed. In this case the state, vaccine and vaccination progress is fetched. First the cache is checked if the data is already present, if not, a database query is performed.
+After that the data is parsed into the template to render the page properly.
 
 ### Generating data
 
-The user generated data consists of same data which are filled with information from a simple form.
-To simulate the Big Data character and to stress the batch processing a hugh amount of data entries can be randomly generated by an JavaScript function.
+The user generated data consists of the same data which is filled with information from a simple form.
+To simulate the Big Data character and to stress the batch processing a huge amount of data entries can be randomly generated by a JavaScript function.
 
 ```
 { 
@@ -72,15 +72,15 @@ To simulate the Big Data character and to stress the batch processing a hugh amo
 ### EJS
 To ensure a cleaner project structure und archive an improved separation of concerns we've decided to use the *Embedded JavaScript Templates* for rendering the pages.
 This provides a separation of logic and the visible structure. Further we were able to reduce the *index.js* to the needed routes and the parts for Kafka, Memcached, MySQL and Express itself.
-As result of that implementation, the project got much cleaner, understandable and the *index.js* handles the complex app logic.
+As a result of that implementation, the project got much cleaner, understandable and the *index.js* handles the complex app logic.
 
-For this use case we have implemented two routes for displaying the application. The root route */* is used to render the index page which serves it data from */web-app/public/overview*.
-The second route */state/:iso* servers all files from */web-app/public/state*. Both of that routes uses the static style files from */web-app/style/style.css*.
+For this use case we have implemented two routes for displaying the application. The root route */* is used to render the index page which serves its data from */web-app/public/overview*.
+The second route */state/:iso* servers all files from */web-app/public/state*. Both of those routes use the static style files from */web-app/style/style.css*.
 
 ### Chart.JS
-To provide a user-friendly data representation and design the generated data is visualized by fancy charts and are not presented by a simple list.
+To provide a user-friendly data representation and design the generated data is visualized by fancy charts and is not presented by a simple list.
 For reducing the development effort the library *ChartJS* is included into this project.
-That possibility of the usage of different chart types provides a much better and understandable comparison between the generated data, like the percentage of vaccinated persons in relation the the population.
+That possibility of the usage of different chart types provide a much better and understandable comparison between the generated data, like the percentage of vaccinated persons in relation to the population.
 
 ### jQuery
 For providing a much easier handling of common JavaScripts functions, like submitting a form or sending data to an url, the library *jQuery* is included into the project.
@@ -89,7 +89,7 @@ For providing a much easier handling of common JavaScripts functions, like submi
 ## Prerequisites
 
 ### Required software
-To develop and deploy the project in a local Kubernetes some software requirements needs to be installed.
+To develop and deploy the project in a local Kubernetes some software requirements need to be installed.
 This case shows the commands for macOS:
 
 - A installed running Minikube: `brew install minikube && minikube start --memory 8192 --cpus 4 --vm-driver=hyperkit`
