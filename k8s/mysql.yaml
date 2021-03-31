@@ -7,8 +7,8 @@ data:
   mysql-init.sql: |
     DROP TABLE IF EXISTS `states`;
     CREATE TABLE `states` (
-      `iso`        varchar(2) NOT NULL,
-      `name`      varchar(255) NOT NULL,
+      `iso` varchar(2) NOT NULL,
+      `name` varchar(255) NOT NULL,
       `population` bigint(20) NOT NULL,
       PRIMARY KEY (`iso`),
       UNIQUE INDEX (`iso`));
@@ -23,9 +23,9 @@ data:
 
     DROP TABLE IF EXISTS `vaccination_progress`;
     CREATE TABLE `vaccination_progress` (
-      `id`           bigint(20) NOT NULL AUTO_INCREMENT,
-      `percentage`   decimal(20, 10) NOT NULL,
-      `statesiso`    varchar(2) NOT NULL,
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
+      `percentage` decimal(20, 10) NOT NULL,
+      `statesiso` varchar(2) NOT NULL,
       `vaccinescode` varchar(3) NOT NULL,
       PRIMARY KEY (`id`),
       UNIQUE INDEX (`id`));
@@ -33,16 +33,12 @@ data:
 
     DROP TABLE IF EXISTS `vaccinations`;
     CREATE TABLE `vaccinations` (
-      `id`           bigint(20) NOT NULL AUTO_INCREMENT,
+      `id` bigint(20) NOT NULL AUTO_INCREMENT,
       `vaccinescode` varchar(3) NOT NULL,
-      `statesiso`    varchar(2) NOT NULL,
-      `vac_amount`   int(10) NOT NULL,
+      `statesiso` varchar(2) NOT NULL,
+      `vac_amount` int(10) NOT NULL,
       PRIMARY KEY (`id`),
       UNIQUE INDEX (`id`));
-
-
-
-
 
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BB', 'Brandenburg', 2522000);
     INSERT INTO `states` (`iso`, `name`, `population`) VALUES ('BE', 'Berlin', 3669000);
