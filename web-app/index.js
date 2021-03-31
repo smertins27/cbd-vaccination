@@ -267,7 +267,7 @@ async function getVaccinationProgress(statesiso) {
 		cacheMiss(key);
 		let data = (await executeQuery(query, [statesiso])).fetchAll();
 		if (data) {
-			let result = data.map(row => ({id: row[0], percentage: row[1], statesiso: row[2], vaccinescode: row[3]}));
+			let result = data.map(row => ({percentage: row[0], statesiso: row[1], vaccinescode: row[2]}));
 			console.log(`Got result=${data}, storing in cache`);
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
@@ -418,17 +418,6 @@ function cacheHit(key, data){
  */
 function cacheMiss(key) {
 	console.log(`Cache miss for key=${key}, querying database`);
-}
-
-//Function for adding up every vaccines percentage
-function addPercentages(percentage) {
-	const percentageLength = Object.keys(percentage).length-2;
-	var i = 0;
-	var summedUp = 0;
-	for(i = 0; i <= percentageLength; i++) {
-		summedUp = summedUp + percentage[i].percentage;
-	}
-	return summedUp;
 }
 
 /* -------------------------------------------------------------------------- */

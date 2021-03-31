@@ -1,40 +1,54 @@
 // Event which is triggered when document is ready
 $('document').ready(() => {
     calculateProgress();
-    renderCharts();
 })
 
-function renderCharts(){
-    const sumVaccinations = 50;
-    let vacChartObject = document.getElementById('vacChart').getContext('2d');
-    let labels = ['Vaccinated', 'Not vaccinated'];
+function renderProgressCharts(progress){
 
-    let notVacPercentage = 100 - sumVaccinations;
+    let vacChartObject = document.getElementById('vacChart').getContext('2d');
+    let labels = ['Vaccinated', 'Pending'];
 
     let chart = new Chart(vacChartObject, {
         type: 'pie',
         data: {
             datasets: [{
-                data: [sumVaccinations, notVacPercentage],
+                data: [progress.vaccinated, progress.pending],
                 backgroundColor: [
                     '#50B432',
-                    '#ED561B'
-                ]
+                    '#808080'
+                ],
+                borderWidth: 0
             }],
             labels: labels
         },
         options: {
-            responsive: true
+            legend: false,
+            responsive: true,
+            segmentShowStroke: false
         }
     });
 }
 
 function calculateProgress(){
-    console.log(vaccinationProgress);
+    let overallProgress = {
+        vaccinated: 0,
+        pending: 100
+    }
     // Calculate progress depending if data exists
     if(vaccinationProgress.length > 0){
+        let sum = 0;
+        vaccinationProgress.forEach(progress => {
+            sum += progress.percentage;
+        });
 
-    }else{ // Fallback for default data
+        // Round sum of vaccination
+        sum = Number ((sum * 100).toFixed(2));
 
+        overallProgress.vaccinated = sum;
+        overallProgress.pending = 100 - sum;
     }
+
+    // Render progress chart
+    renderProgressCharts(overallProgress);
+
 }
