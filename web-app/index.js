@@ -169,10 +169,9 @@ app.get('/', (req, res) => {
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
-	Promise.all([getState(isoCode), getVaccinations(), getVaccinationProgress(isoCode)]).then(values => {//
-		console.log(values);
+	Promise.all([getState(isoCode), getVaccinations(), getVaccinationProgress(isoCode)]).then(values => {
 		const state = values[0];
-		const percentage = values[2];//
+		const percentage = values[2];
 		const summedUp = addPercentages(percentage);
 
 		const parameters = {
@@ -214,7 +213,7 @@ app.use(express.json())
 		}
 		data.vac_amount = vacAmount;
 		data.percent = parseFloat(percent);
-		console.log(data);
+
 		sendVaccinationMessage(data).then(() => console.log("Sent to kafka"))
 		.catch(e => console.log("Error sending to kafka", e)) 
 	}).catch(e => { // Catch error to prevent server crash
@@ -257,7 +256,7 @@ async function getStates(){
 	}
 }
 
-//Method for getting vaccination_progress from database
+// Method for getting vaccination_progress from database
 async function getVaccinationProgress(vaccination_progress) {
 	const query = "SELECT id, percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
 	let cacheData = await getFromCache(vaccination_progress);

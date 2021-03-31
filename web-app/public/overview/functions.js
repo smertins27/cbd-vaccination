@@ -2,7 +2,6 @@
 $('document').ready(() => {
     loadSVG();
     const states = document.getElementById("states");
-    console.log(states.name);
 })
 
 /**
@@ -21,7 +20,10 @@ function loadSVG() {
     });
 }
 
-
+/**
+ * Perform send of data to backend
+ * @param data Array which contains all needed data
+ */
 function postData(data){
 
     $.ajax({
@@ -43,11 +45,13 @@ function postData(data){
  */
 function saveVaccinations(){
     const form = $('#vaccinationForm');
-    vaccinations = form.serializeArray();
-    var result = {};
-    var timestamp = Math.floor(new Date() / 1000)
+    let vaccinations = form.serializeArray();
+    let result = {};
+    let timestamp = Math.floor(new Date() / 1000)
     for (let key in vaccinations) {
-     result[vaccinations[key].name] = vaccinations[key].value;
+        if (vaccinations.hasOwnProperty(key)){
+            result[vaccinations[key].name] = vaccinations[key].value;
+        }
     }
     result["timestamp"] = timestamp;
     result["percent"] = 0;
@@ -59,11 +63,6 @@ function saveVaccinations(){
     console.log(result);
     postData(result);
     
-}
-
-function saveStatesAndVaccinescode(state, vaccinescode){
-    console.log(state)
-    console.log(vaccinescode)
 }
 
 function createRandomInt(max) {
@@ -121,6 +120,10 @@ function validateForm(){
     }
 }
 
+/**
+ * Method triggered by clicking on a state of the svg
+ * @param iso
+ */
 function clickOnState(iso){
     location.href = '/state/' + iso;
 }
