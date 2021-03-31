@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap" rel="stylesheet">
     <!-- External file for js functions -->
     <script type="application/javascript">
-        const sumVaccinations = parseFloat("<%= summedUp%>") * 100;
+        const vaccinationProgress = '<%- JSON.stringify(progress)%>'
     </script>
     <script type="application/javascript" src="../public/state/functions.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>

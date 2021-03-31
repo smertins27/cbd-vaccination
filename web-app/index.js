@@ -169,15 +169,13 @@ app.get('/', (req, res) => {
 app.get('/state/:iso', function(req, res){
 	let isoCode = req.params.iso.toUpperCase();
 
-	Promise.all([getState(isoCode), getVaccinations(), getVaccinationProgress(isoCode)]).then(values => {
+	Promise.all([getState(isoCode), getVaccinationProgress(isoCode)]).then(values => {
 		const state = values[0];
-		const percentage = values[2];
-		// const summedUp = addPercentages(percentage);
-		const summedUp = 0;
+		const progress = values[1];
+		console.log(progress);
 		const parameters = {
-			state,
-			percentage,
-			summedUp,
+			state: state.result,
+			progress: progress.result,
 			pageInfo: { hostname: os.hostname(), date: new Date(), memcachedServers, cachedState: state.cached}
 		}
 		res.render(path.join(__dirname, 'public/state/state.html'), parameters);
@@ -193,15 +191,15 @@ app.use(express.json())
 	const data = req.body;
 	res.send(true);
 	Promise.all([getState(data.statesiso), checkIfStateWithVaccineIsInDatabase(data.statesiso, data.vaccinescode)]).then(values =>{
-		const pop = values[0].population;
+		const pop = values[0].result.population;
 		const vacAmount = parseInt(data.vac_amount);
 		const per = vacAmount / pop;
 		const percent = per.toFixed(6);
-		if (values[1].vacId) { 
-			const progressId = values[1].progressId;
-			const percentageInDb = values[1].dataPercentage;
-			const vacId = values[1].vacId;
-			const vacAmountInDb = values[1].dataVacAmount;
+		if (values[1] !== undefined) {
+			const progressId = values[1].result.progressId;
+			const percentageInDb = values[1].result.dataPercentage;
+			const vacId = values[1].result.vacId;
+			const vacAmountInDb = values[1].result.dataVacAmount;
 			data.progressId = parseInt(progressId);
 			data.vacId = parseInt(vacId);
 			data.vacAmountInDb = parseFloat(vacAmountInDb);
@@ -259,22 +257,21 @@ async function getStates(){
 // Method for getting vaccination_progress from database
 async function getVaccinationProgress(statesiso) {
 	let key = 'vacProgress_' + statesiso;
-	const query = "SELECT id, percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
+	const query = "SELECT percentage, statesiso, vaccinescode FROM vaccination_progress WHERE statesiso = ?";
 	let cacheData = await getFromCache(key);
 
 	if(cacheData) {
-		console.log("Cache hit!");
 		cacheHit(key, cacheData);
-		return { ...cacheData, cached: true}
+		return { result: cacheData, cached: true }
 	} else {
 		cacheMiss(key);
-		let data = (await executeQuery(query, [key])).fetchAll();
+		let data = (await executeQuery(query, [statesiso])).fetchAll();
 		if (data) {
 			let result = data.map(row => ({id: row[0], percentage: row[1], statesiso: row[2], vaccinescode: row[3]}));
-			console.log(`Got result=${data}, storing in cache tom`);
+			console.log(`Got result=${data}, storing in cache`);
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
-			return {...result, cached: false}
+			return { result, cached: false}
 		} else {
 			throw "No data found for this state"
 		}
@@ -323,7 +320,7 @@ async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
 	let cacheData = await getFromCache(key);
 	if(cacheData){
 		cacheHit(key, cacheData);
-		return { ...cacheData, cached: true };
+		return { result: cacheData, cached: true };
 	}else{
 		cacheMiss(key);
 		let data = (await executeQuery(progressQuery, [state, vaccinescode])).fetchOne();
@@ -335,9 +332,9 @@ async function checkIfStateWithVaccineIsInDatabase(state, vaccinescode) {
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
 
-			return { ...result, cached: false }
+			return { result, cached: false }
 		} else {
-			return {}
+			return undefined
 		}
 	}
 }
@@ -353,7 +350,7 @@ async function getState(key) {
 
 	if(cacheData){
 		cacheHit(key, cacheData);
-		return { ...cacheData, cached: true };
+		return { result: cacheData, cached: true }
 	}else{
 		cacheMiss(key);
 		let data = (await executeQuery(query, [key])).fetchOne();
@@ -363,7 +360,7 @@ async function getState(key) {
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);
 
-			return { ...result, cached: false }
+			return { result, cached: false }
 		} else {
 			throw "No data found for this state"
 		}
@@ -378,21 +375,21 @@ async function getState(key) {
  */
 async function getVaccinations() {
 	const key = 'vaccinationsFromDb';
-	const query = 'SELECT id, vaccinescode, statesiso, vac_amount FROM vaccinations';
+	const query = 'SELECT * FROM vaccinations';
 	let cacheData = await getFromCache(key);
 	if (cacheData){
 		cacheHit(key, cacheData);
 		return{ ...cacheData, cached: true };
 	}else{
 		cacheMiss(key);
-		let executeResult = await executeQuery("SELECT * FROM vaccinations", [])
+		let executeResult = await executeQuery(query, [])
 		let data = executeResult.fetchAll();
 		if (data) {
 			console.log(`Got result=${data}, storing in cache`);
 			let result = data.map(row => ({id: row[0], vaccinescode: row[1], statesiso: row[2], vac_amount: row[3]}));
 			if (memcached)
 				await memcached.set(key, result, cacheTimeSecs);	
-			return {result, cached: false}
+			return { result, cached: false}
 		} else{
 			throw "No vaccination data found"
 		}

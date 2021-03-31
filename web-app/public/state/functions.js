@@ -1,9 +1,11 @@
 // Event which is triggered when document is ready
 $('document').ready(() => {
+    calculateProgress();
     renderCharts();
 })
 
 function renderCharts(){
+    const sumVaccinations = 50;
     let vacChartObject = document.getElementById('vacChart').getContext('2d');
     let labels = ['Vaccinated', 'Not vaccinated'];
 
@@ -25,4 +27,14 @@ function renderCharts(){
             responsive: true
         }
     });
+}
+
+function calculateProgress(){
+    console.log(vaccinationProgress);
+    // Calculate progress depending if data exists
+    if(vaccinationProgress.length > 0){
+
+    }else{ // Fallback for default data
+
+    }
 }
