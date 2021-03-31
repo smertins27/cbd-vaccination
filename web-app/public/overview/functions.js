@@ -59,8 +59,6 @@ function saveVaccinations(){
     result["vacId"] = 0;
     result["vacAmountInDb"] = 0;
     result["percentageInDb"] = 0;
-    console.log(typeof result.percent);
-    console.log(result);
     postData(result);
     
 }
@@ -94,7 +92,6 @@ function addRandomVaccinations(){
         result["vacId"] = 0;
         result["vacAmountInDb"] = 0;
         result["percentageInDb"] = 0;
-        console.log(result)
         postData(result);
     } 
 }
