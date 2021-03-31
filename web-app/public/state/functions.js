@@ -3,6 +3,10 @@ $('document').ready(() => {
     renderCharts();
 })
 
+/**
+ * Method for rendering the progress chart
+ * @param progress Object which contains the progress
+ */
 function renderProgressChart(progress){
 
     let vacChartObject = document.getElementById('progressChart').getContext('2d');
@@ -29,6 +33,10 @@ function renderProgressChart(progress){
     });
 }
 
+/**
+ * Method for render the vaccines distribution chart
+ * @param chartElements Object which contains labels and values elements
+ */
 function renderDistributionChart(chartElements){
     let vacChartObject = document.getElementById('distributionChart').getContext('2d');
 
@@ -50,6 +58,9 @@ function renderDistributionChart(chartElements){
     });
 }
 
+/**
+ * Generic method for render the charts and calculate the needed data
+ */
 function renderCharts(){
     // Render percentage progress chart
     const percentageProgress = calculatePercentageProgress();
@@ -61,6 +72,10 @@ function renderCharts(){
 
 }
 
+/**
+ * Method for calculation of the progress on existing data
+ * @return {{pending: number, vaccinated: number}}
+ */
 function calculatePercentageProgress(){
     let overallProgress = {
         vaccinated: 0,
@@ -83,10 +98,10 @@ function calculatePercentageProgress(){
     return overallProgress;
 }
 
-function roundFloat(number, fractionDigits = 2){
-    return Number ((number).toFixed(fractionDigits))
-}
-
+/**
+ * Method for vaccines distribution calculation
+ * @return {{values: [], labels: []}}
+ */
 function calculateVaccinesDistribution(){
     const labels = [];
     const values = [];
@@ -94,16 +109,26 @@ function calculateVaccinesDistribution(){
     let vaccinesDistribution = 0;
     vaccinationProgress.forEach(vaccination => {
         vaccinesDistribution += roundFloat(vaccination.percentage * 100);
-    })
-
+    });
     vaccinationProgress.forEach(vaccination => {
         const vaccineDistribution = roundFloat(vaccination.percentage * 100);
         const distribution = vaccineDistribution / vaccinesDistribution * 100;
         values.push(roundFloat(distribution));
 
-        const vacName = vaccines.find(vac => vac.code === vaccination.vaccinescode).name
-        labels.push(vacName);
+        const vaccine = vaccines.find(vac => vac.code === vaccination.vaccinescode)
+        labels.push(vaccine.name);
+
     })
 
     return {labels, values};
+}
+
+/**
+ * Helper method for round a float
+ * @param number Number which needed to be rounded
+ * @param fractionDigits Number of decimal places (default = 2)
+ * @return {number}
+ */
+function roundFloat(number, fractionDigits = 2){
+    return Number ((number).toFixed(fractionDigits))
 }
